@@ -29,18 +29,27 @@ public class XWPFSDT extends XWPFAbstractSDT
         implements IBodyElement, IRunBody, ISDTContents, IRunElement {
     private final ISDTContent content;
 
+    public CTSdtRun getCtSdtRun() {
+        return ctSdtRun;
+    }
+
+    private CTSdtRun ctSdtRun;
+
     public XWPFSDT(CTSdtRun sdtRun, IBody part) {
-        super(sdtRun.getSdtPr(), part);
+
+        super(new XWPFSDTPr(sdtRun.getSdtPr()), part);
+        this.ctSdtRun = sdtRun;
         this.content = new XWPFSDTContent(sdtRun.getSdtContent(), part, this);
     }
 
     public XWPFSDT(CTSdtBlock block, IBody part) {
-        super(block.getSdtPr(), part);
+        super(new XWPFSDTPr(block.getSdtPr()), part);
         this.content = new XWPFSDTContent(block.getSdtContent(), part, this);
     }
 
     public ISDTContent getContent() {
         return content;
     }
+
 
 }
