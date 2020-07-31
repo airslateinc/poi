@@ -31,7 +31,7 @@ public class XWPFSDTCell extends XWPFAbstractSDT implements ICell {
     private final XWPFSDTContentCell cellContent;
 
     public XWPFSDTCell(CTSdtCell sdtCell, XWPFTableRow xwpfTableRow, IBody part) {
-        super(sdtCell.getSdtPr(), part);
+        super(new XWPFSDTPr(sdtCell.getSdtPr()), part);
         cellContent = new XWPFSDTContentCell(sdtCell.getSdtContent(), xwpfTableRow, part);
     }
 

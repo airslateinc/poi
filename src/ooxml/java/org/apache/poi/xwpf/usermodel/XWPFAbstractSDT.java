@@ -18,7 +18,6 @@ package org.apache.poi.xwpf.usermodel;
 
 import org.apache.poi.ooxml.POIXMLDocumentPart;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
 
 /**
  * Experimental abstract class that is a base for XWPFSDT and XWPFSDTCell
@@ -28,44 +27,26 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
  * These classes have so far been built only for read-only processing.
  */
 public abstract class XWPFAbstractSDT implements ISDTContents {
-    private final String title;
-    private final String tag;
-    private final IBody part;
 
-    public XWPFAbstractSDT(CTSdtPr pr, IBody part) {
-        if (pr == null) {
-            title = "";
-            tag = "";
-        } else {
-            CTString[] aliases = pr.getAliasArray();
-            if (aliases != null && aliases.length > 0) {
-                title = aliases[0].getVal();
-            } else {
-                title = "";
-            }
-            CTString[] tags = pr.getTagArray();
-            if (tags != null && tags.length > 0) {
-                tag = tags[0].getVal();
-            } else {
-                tag = "";
-            }
-        }
+    private XWPFSDTPr sdtPr;
+    private IBody part;
+
+    public XWPFAbstractSDT(IBody part) {
+        this.sdtPr = new XWPFSDTPr();
         this.part = part;
-
     }
 
-    /**
-     * @return first SDT Title
-     */
-    public String getTitle() {
-        return title;
+    public XWPFAbstractSDT(XWPFSDTPr sdtPr, IBody part) {
+        this.sdtPr = sdtPr;
+        this.part = part;
     }
 
-    /**
-     * @return first SDT Tag
-     */
-    public String getTag() {
-        return tag;
+    public XWPFSDTPr getSdtPr() {
+        return sdtPr;
+    }
+
+    public void setSdtPr(XWPFSDTPr sdtPr) {
+        this.sdtPr = sdtPr;
     }
 
     /**

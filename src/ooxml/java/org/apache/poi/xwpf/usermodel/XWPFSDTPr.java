@@ -20,18 +20,16 @@ public class XWPFSDTPr {
     }
 
     public XWPFSDTPr(CTSdtPr pr) {
-        this.pr = pr;
+        this.pr = pr == null ? CTSdtPr.Factory.newInstance() : pr;
     }
 
     /**
      * @return first SDT Title
      */
     public String getTitle() {
-        CTString[] aliases = pr.getAliasArray();
-        if (aliases != null && aliases.length > 0) {
-            return aliases[0].getVal();
-        }
-        return "";
+        return pr.getAliasList().size() > 0
+                ? pr.getAliasList().get(0).getVal()
+                : null;
     }
 
     /**
@@ -55,11 +53,9 @@ public class XWPFSDTPr {
      * @return first SDT Tag
      */
     public String getTag() {
-        CTString[] tags = pr.getTagArray();
-        if (tags != null && tags.length > 0) {
-            return tags[0].getVal();
-        }
-        return "";
+        return pr.getTagList().size() > 0
+                ? pr.getTagList().get(0).getVal()
+                : null;
     }
 
     /**
