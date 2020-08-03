@@ -12,13 +12,13 @@ public class XWPFSDTRun extends XWPFAbstractSDT
     public XWPFSDTRun(IBody part) {
         super(part);
         this.sdtRun = CTSdtRun.Factory.newInstance();
-        this.content = new XWPFSDTContent(sdtRun.getSdtContent(), part, this);
+        this.content = new XWPFSDTContentRun(sdtRun.getSdtContent(), part, this);
     }
 
     public XWPFSDTRun(CTSdtRun sdtRun, IBody part) {
         super(new XWPFSDTPr(sdtRun.getSdtPr()), part);
         this.sdtRun = sdtRun;
-        this.content = new XWPFSDTContent(this.sdtRun.getSdtContent(), part, this);
+        this.content = new XWPFSDTContentRun(this.sdtRun.getSdtContent(), part, this);
     }
 
     @Override

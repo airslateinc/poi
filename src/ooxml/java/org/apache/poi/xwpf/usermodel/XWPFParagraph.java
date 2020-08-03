@@ -132,10 +132,6 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContents, Para
                     iruns.add(fr);
                 }
             }
-            if (o instanceof CTSdtBlock) {
-                XWPFSDTBlock cc = new XWPFSDTBlock((CTSdtBlock) o, part);
-                iruns.add(cc);
-            }
             if (o instanceof CTSdtRun) {
                 XWPFSDTRun cc = new XWPFSDTRun((CTSdtRun) o, part);
                 iruns.add(cc);
