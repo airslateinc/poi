@@ -220,7 +220,7 @@ public final class TestXWPFSDT {
         XWPFAbstractSDT sdtRun = (XWPFAbstractSDT) paragraph.getIRuns().get(1);
 
         // SdtRun
-        assertTrue(sdtRun instanceof XWPFSDT);
+        assertTrue(sdtRun instanceof XWPFSDTRun);
 
         // Tag
         assertEquals("inline-sdt-tag", sdtRun.getSdtPr().getTag());
@@ -243,7 +243,7 @@ public final class TestXWPFSDT {
         // SdtBlock
         XWPFAbstractSDT sdtBlock = (XWPFAbstractSDT) doc.getBodyElements().get(2);
 
-        assertTrue(sdtBlock instanceof XWPFSDT);
+        assertTrue(sdtBlock instanceof XWPFSDTBlock);
 
         // Tag
         assertEquals("block-sdt-tag", sdtBlock.getSdtPr().getTag());
@@ -297,15 +297,15 @@ public final class TestXWPFSDT {
     private List<XWPFAbstractSDT> extractSDTsFromBodyElements(List<IBodyElement> elements) {
         List<XWPFAbstractSDT> sdts = new ArrayList<>();
         for (IBodyElement e : elements) {
-            if (e instanceof XWPFSDT) {
-                XWPFSDT sdt = (XWPFSDT) e;
+            if (e instanceof XWPFSDTBlock) {
+                XWPFSDTBlock sdt = (XWPFSDTBlock) e;
                 sdts.add(sdt);
             } else if (e instanceof XWPFParagraph) {
 
                 XWPFParagraph p = (XWPFParagraph) e;
                 for (IRunElement e2 : p.getIRuns()) {
-                    if (e2 instanceof XWPFSDT) {
-                        XWPFSDT sdt = (XWPFSDT) e2;
+                    if (e2 instanceof XWPFSDTRun) {
+                        XWPFSDTRun sdt = (XWPFSDTRun) e2;
                         sdts.add(sdt);
                     }
                 }

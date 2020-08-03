@@ -74,7 +74,7 @@ public class XWPFSDTContent implements ISDTContent {
                 bodyElements.add(t);
                 // tables.add(t);
             } else if (o instanceof CTSdtBlock) {
-                XWPFSDT c = new XWPFSDT(((CTSdtBlock) o), part);
+                XWPFSDTBlock c = new XWPFSDTBlock(((CTSdtBlock) o), part);
                 bodyElements.add(c);
                 // contentControls.add(c);
             } else if (o instanceof CTR) {
@@ -98,8 +98,8 @@ public class XWPFSDTContent implements ISDTContent {
             } else if (o instanceof XWPFTable) {
                 appendTable((XWPFTable) o, text);
                 addNewLine = true;
-            } else if (o instanceof XWPFSDT) {
-                text.append(((XWPFSDT) o).getContent().getText());
+            } else if (o instanceof XWPFSDTBlock) {
+                text.append(((XWPFSDTBlock) o).getContent().getText());
                 addNewLine = true;
             } else if (o instanceof XWPFRun) {
                 text.append(o);

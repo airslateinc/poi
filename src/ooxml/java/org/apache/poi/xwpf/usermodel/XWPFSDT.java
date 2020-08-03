@@ -27,7 +27,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
  */
 public class XWPFSDT extends XWPFAbstractSDT
         implements IBodyElement, IRunBody, ISDTContents, IRunElement {
-    private final ISDTContent content;
+    private ISDTContent content;
 
     public CTSdtRun getCtSdtRun() {
         return ctSdtRun;
@@ -36,7 +36,6 @@ public class XWPFSDT extends XWPFAbstractSDT
     private CTSdtRun ctSdtRun;
 
     public XWPFSDT(CTSdtRun sdtRun, IBody part) {
-
         super(new XWPFSDTPr(sdtRun.getSdtPr()), part);
         this.ctSdtRun = sdtRun;
         this.content = new XWPFSDTContent(sdtRun.getSdtContent(), part, this);
@@ -50,6 +49,4 @@ public class XWPFSDT extends XWPFAbstractSDT
     public ISDTContent getContent() {
         return content;
     }
-
-
 }

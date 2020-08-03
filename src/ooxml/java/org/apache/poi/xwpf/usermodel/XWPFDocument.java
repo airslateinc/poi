@@ -108,7 +108,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     protected List<XWPFHyperlink> hyperlinks = new ArrayList<>();
     protected List<XWPFParagraph> paragraphs = new ArrayList<>();
     protected List<XWPFTable> tables = new ArrayList<>();
-    protected List<XWPFSDT> contentControls = new ArrayList<>();
+    protected List<XWPFAbstractSDT> contentControls = new ArrayList<>();
     protected List<IBodyElement> bodyElements = new ArrayList<>();
     protected List<XWPFPictureData> pictures = new ArrayList<>();
     protected Map<Long, List<XWPFPictureData>> packagePictures = new HashMap<>();
@@ -203,7 +203,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                             bodyElements.add(t);
                             tables.add(t);
                         } else if (bodyObj instanceof CTSdtBlock) {
-                            XWPFSDT c = new XWPFSDT((CTSdtBlock) bodyObj, this);
+                            XWPFSDTBlock c = new XWPFSDTBlock((CTSdtBlock) bodyObj, this);
                             bodyElements.add(c);
                             contentControls.add(c);
                         }
@@ -855,6 +855,12 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
         bodyElements.add(p);
         paragraphs.add(p);
         return p;
+    }
+
+    public XWPFSDTBlock createSdt() {
+        XWPFSDTBlock sdt = new XWPFSDTBlock(ctDocument.getBody().addNewSdt(), this);
+        bodyElements.add(sdt);
+        return sdt;
     }
 
     /**
