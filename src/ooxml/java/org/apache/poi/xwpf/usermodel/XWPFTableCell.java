@@ -105,11 +105,6 @@ public class XWPFTableCell implements IBody, ICell {
                 XWPFSDTBlock c = new XWPFSDTBlock((CTSdtBlock) o, this);
                 bodyElements.add(c);
             }
-            if (o instanceof CTSdtRun) {
-                XWPFSDTRun c = new XWPFSDTRun((CTSdtRun) o, this);
-                System.out.println(c.getContent().getText());
-                bodyElements.add(c);
-            }
         }
         cursor.dispose();
     }

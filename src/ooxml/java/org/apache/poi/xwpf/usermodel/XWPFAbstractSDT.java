@@ -26,19 +26,11 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
  * <p>
  * These classes have so far been built only for read-only processing.
  */
-public abstract class XWPFAbstractSDT implements ISDTContents {
-
+public abstract class XWPFAbstractSDT {
     private XWPFSDTPr sdtPr;
-    private IBody part;
 
-    public XWPFAbstractSDT(IBody part) {
-        this.sdtPr = new XWPFSDTPr();
-        this.part = part;
-    }
-
-    public XWPFAbstractSDT(XWPFSDTPr sdtPr, IBody part) {
+    public XWPFAbstractSDT(XWPFSDTPr sdtPr) {
         this.sdtPr = sdtPr;
-        this.part = part;
     }
 
     public XWPFSDTPr getSdtPr() {
@@ -53,36 +45,4 @@ public abstract class XWPFAbstractSDT implements ISDTContents {
      * @return the content object
      */
     public abstract ISDTContent getContent();
-
-    /**
-     * @return null
-     */
-    public IBody getBody() {
-        return null;
-    }
-
-    /**
-     * @return document part
-     */
-    public POIXMLDocumentPart getPart() {
-        return part.getPart();
-    }
-
-    /**
-     * @return partType
-     */
-    public BodyType getPartType() {
-        return BodyType.CONTENTCONTROL;
-    }
-
-    /**
-     * @return element type
-     */
-    public BodyElementType getElementType() {
-        return BodyElementType.CONTENTCONTROL;
-    }
-
-    public XWPFDocument getDocument() {
-        return part.getXWPFDocument();
-    }
 }

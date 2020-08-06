@@ -12,11 +12,10 @@ public class XWPFSDTContentBlock implements ISDTContent {
     // private final XWPFDocument document;
     // private List<XWPFParagraph> paragraphs = new ArrayList<>();
     // private List<XWPFTable> tables = new ArrayList<>();
-    // private List<XWPFRun> runs = new ArrayList<>();
     // private List<XWPFSDT> contentControls = new ArrayList<>();
-    private List<ISDTContents> bodyElements = new ArrayList<>();
+    private List<IBodyElement> bodyElements = new ArrayList<>();
 
-    public XWPFSDTContentBlock(CTSdtContentBlock block, IBody part, IRunBody parent) {
+    public XWPFSDTContentBlock(CTSdtContentBlock block, IBody part) {
         if (block == null) {
             return;
         }
@@ -36,10 +35,6 @@ public class XWPFSDTContentBlock implements ISDTContent {
                 XWPFSDTBlock c = new XWPFSDTBlock(((CTSdtBlock) o), part);
                 bodyElements.add(c);
                 // contentControls.add(c);
-            } else if (o instanceof CTR) {
-                XWPFRun run = new XWPFRun((CTR) o, parent);
-                // runs.add(run);
-                bodyElements.add(run);
             }
         }
         cursor.dispose();
@@ -60,9 +55,6 @@ public class XWPFSDTContentBlock implements ISDTContent {
             } else if (o instanceof XWPFSDTBlock) {
                 text.append(((XWPFSDTBlock) o).getContent().getText());
                 addNewLine = true;
-            } else if (o instanceof XWPFRun) {
-                text.append(o);
-                addNewLine = false;
             }
             if (addNewLine && i < bodyElements.size() - 1) {
                 text.append("\n");

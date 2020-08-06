@@ -36,7 +36,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
  * actual text (possibly along with more styling) is held on
  * the child {@link XWPFRun}s.</p>
  */
-public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContents, Paragraph {
+public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock, Paragraph {
     private final CTP paragraph;
     protected IBody part;
     /**
@@ -133,7 +133,7 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContents, Para
                 }
             }
             if (o instanceof CTSdtRun) {
-                XWPFSDTRun cc = new XWPFSDTRun((CTSdtRun) o, part);
+                XWPFSDTRun cc = new XWPFSDTRun((CTSdtRun) o, this);
                 iruns.add(cc);
             }
             if (o instanceof CTRunTrackChange) {
@@ -1448,6 +1448,12 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContents, Para
         runs.add(xwpfRun);
         iruns.add(xwpfRun);
         return xwpfRun;
+    }
+
+    public XWPFSDTRun createSdtRun() {
+        XWPFSDTRun sdtRun = new XWPFSDTRun(paragraph.addNewSdt(), (IRunBody)this);
+        iruns.add(sdtRun);
+        return sdtRun;
     }
 
     /**
