@@ -17,20 +17,16 @@
 
 package org.apache.poi.xwpf.usermodel;
 
-import static org.apache.poi.POITestCase.assertContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.poi.xwpf.XWPFTestDataSamples;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.xwpf.XWPFTestDataSamples;
-import org.junit.Test;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.impl.CTStringImpl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
+import static org.apache.poi.POITestCase.assertContains;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public final class TestXWPFSDT {
 
@@ -167,122 +163,6 @@ public final class TestXWPFSDT {
             assertEquals(null, sdts.get(0).getSdtPr().getTag());
             assertEquals(null, sdts.get(0).getSdtPr().getTitle());
         }
-    }
-
-    @Test
-    public void testSdtRunCreated() {
-        XWPFDocument doc = new XWPFDocument();
-        XWPFParagraph p = doc.createParagraph();
-        p.createRun().setText("Sample run ");
-
-        XWPFSDTRun sdtRun = p.createSdtRun();
-        sdtRun.getContent().getText();
-
-        Object target1 = ((XWPFParagraph) doc.getBodyElements().get(0)).getIRuns().get(1);
-        assertEquals(XWPFSDTRun.class, target1.getClass());
-        assertEquals("sdtRunWrapped", target1);
-    }
-
-    @Test
-    public void testCreateSdtFromScratch() {
-        XWPFDocument doc = new XWPFDocument();
-
-        XWPFParagraph p1 = doc.createParagraph();
-        XWPFRun r1 = p1.createRun();
-        r1.setText("First paragraph text");
-
-        XWPFSDTBlock block1 = doc.createSdt();
-
-
-        XWPFParagraph p2 = doc.createParagraph();
-        XWPFRun r2 = p2.createRun();
-        r2.setText("Second paragraph text");
-
-        XWPFParagraph p3 = doc.createParagraph();
-        XWPFRun r3 = p3.createRun();
-        r3.setText("Third paragraph text");
-
-        System.out.println(doc.getDocument().getBody().toString());
-    }
-    @Test
-    public void testElementsStructureInsideSdtRun() throws Exception {
-        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
-        System.err.println(doc.getDocument().getBody().toString());
-        System.out.println("Hello");
-    }
-
-    public void testElementsStructureInsideSdtBlock() throws Exception {
-        // todo
-    }
-
-    /**
-     * Test SdtPr get/set tag, title, lock for SdtBlock
-     * @throws Exception
-     */
-    @Test
-    public void testSdtPrForBlock() throws Exception {
-        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
-
-        XWPFAbstractSDT sdtBlock = (XWPFAbstractSDT) doc.getBodyElements().get(2);
-
-        assertTrue(sdtBlock instanceof XWPFSDTBlock);
-
-        // Tag
-        assertEquals("block-sdt-tag", sdtBlock.getSdtPr().getTag());
-
-        sdtBlock.getSdtPr().setTag("new-block-tag");
-        assertEquals("new-block-tag", sdtBlock.getSdtPr().getTag());
-
-        // Title
-        assertEquals("block-sdt-title", sdtBlock.getSdtPr().getTitle());
-
-        sdtBlock.getSdtPr().setTitle("new-block-title");
-        assertEquals("new-block-title", sdtBlock.getSdtPr().getTitle());
-
-        // Lock
-        assertEquals(XWPFSDTLock.locks.get(XWPFSDTLock.Enum.SDT_CONTENT_LOCKED), sdtBlock.getSdtPr().getLock().getVal());
-
-        sdtBlock.getSdtPr().setLock(XWPFSDTLock.Enum.UNLOCKED);
-        assertEquals(XWPFSDTLock.locks.get(XWPFSDTLock.Enum.UNLOCKED), sdtBlock.getSdtPr().getLock().getVal());
-    }
-
-    /**
-     * Test SdtPr get/set tag, title, lock for SdtRun
-     * @throws Exception
-     */
-    @Test
-    public void testSdtPrForRun() throws Exception {
-        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
-
-        XWPFParagraph paragraph = doc.getParagraphArray(0);
-        XWPFAbstractSDT sdtRun = (XWPFAbstractSDT) paragraph.getIRuns().get(1);
-
-        assertTrue(sdtRun instanceof XWPFSDTRun);
-
-        // Tag
-        assertEquals("inline-sdt-tag", sdtRun.getSdtPr().getTag());
-
-        sdtRun.getSdtPr().setTag("new-inline-tag");
-        assertEquals("new-inline-tag", sdtRun.getSdtPr().getTag());
-
-        // Title
-        assertEquals("inline-sdt-title", sdtRun.getSdtPr().getTitle());
-
-        sdtRun.getSdtPr().setTitle("new-inline-title");
-        assertEquals("new-inline-title", sdtRun.getSdtPr().getTitle());
-
-        // Lock
-        assertEquals(XWPFSDTLock.locks.get(XWPFSDTLock.Enum.SDT_CONTENT_LOCKED), sdtRun.getSdtPr().getLock().getVal());
-
-        sdtRun.getSdtPr().setLock(XWPFSDTLock.Enum.SDT_LOCKED);
-        assertEquals(XWPFSDTLock.locks.get(XWPFSDTLock.Enum.SDT_LOCKED), sdtRun.getSdtPr().getLock().getVal());
-    }
-
-    @Test
-    public void testSdtBlock() throws Exception {
-        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
-
-        // ...
     }
 
     private List<XWPFAbstractSDT> extractAllSDTs(XWPFDocument doc) {
