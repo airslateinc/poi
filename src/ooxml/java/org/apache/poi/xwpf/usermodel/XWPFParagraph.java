@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.poi.ooxml.POIXMLDocumentPart;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.util.Internal;
 import org.apache.poi.wp.usermodel.Paragraph;
 import org.apache.xmlbeans.XmlCursor;
@@ -1456,6 +1457,30 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         return sdtRun;
     }
 
+    public XWPFSDTRun insertNewSDTRunBeforeRun(XWPFRun run) {
+        int pos = iruns.indexOf(run);
+        if (pos == iruns.size()) {
+            return createSdtRun();
+        }
+        return insertNewProvidedSdtRun(pos, newCursor -> {
+            String uri = CTSdtRun.type.getName().getNamespaceURI();
+            String localPart = "sdt";
+            // creates a new sdt run, cursor is positioned inside the new
+            // element
+            newCursor.beginElement(localPart, uri);
+            // move the cursor to the START token to the run just created
+            newCursor.toParent();
+            CTSdtRun sdtRun = (CTSdtRun) newCursor.getObject();
+            return new XWPFSDTRun(sdtRun, (IRunBody)this);
+        });
+    }
+
+    public XWPFSDTRun replaceRunWithSdtRun(XWPFRun run) {
+        XWPFSDTRun sdtRun = new XWPFSDTRun(paragraph.addNewSdt(), (IRunBody)this);
+        sdtRun.addExistingRun(run);
+        return sdtRun;
+    }
+
     /**
      * Appends a new hyperlink run to this paragraph
      *
@@ -1602,6 +1627,44 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
                 iruns.add(iPos, newRun);
                 // Runs itself is easy to update
                 runs.add(pos, newRun);
+                return newRun;
+            }
+            newCursor.dispose();
+        }
+        return null;
+    }
+
+    /**
+     * insert a new run provided by  in all runs
+     *
+     * @param pos The position at which the new run should be added.
+     * @param provider provide a new run at position of the given cursor.
+     * @return the inserted run or null if the given pos is out of bounds.
+     */
+    private XWPFSDTRun insertNewProvidedSdtRun(int pos, Function<XmlCursor, XWPFSDTRun> provider) {
+        if (pos >= 0 && pos < runs.size()) {
+            XWPFRun run = runs.get(pos);
+            CTR ctr = run.getCTR();
+
+            XmlCursor newCursor = ctr.newCursor();
+            if (!isCursorInParagraph(newCursor)) {
+                // look up correct position for CTP -> XXX -> R array
+                newCursor.toParent();
+            }
+            if (isCursorInParagraph(newCursor)) {
+                // provide a new run
+                XWPFSDTRun newRun = provider.apply(newCursor);
+
+//                // To update the iruns, find where we're going
+//                // in the normal runs, and go in there
+//                int iPos = iruns.size();
+//                int oldAt = iruns.indexOf(run);
+//                if (oldAt != -1) {
+//                    iPos = oldAt;
+//                }
+                iruns.add(pos, newRun);
+                // Runs itself is easy to update
+//                runs.add(pos, newRun);
                 return newRun;
             }
             newCursor.dispose();
