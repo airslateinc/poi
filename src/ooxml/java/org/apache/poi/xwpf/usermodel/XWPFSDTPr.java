@@ -1,9 +1,6 @@
 package org.apache.poi.xwpf.usermodel;
 
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLock;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STLock;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 /**
  * @author byy
@@ -12,40 +9,43 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STLock;
  */
 public class XWPFSDTPr {
 
-    private CTSdtPr pr;
-    private IBody part;
-
-    public XWPFSDTPr() {
-        this.pr = CTSdtPr.Factory.newInstance();
-    }
+    private CTSdtPr sdtPr;
 
     public XWPFSDTPr(CTSdtPr pr) {
-        this.pr = pr == null ? CTSdtPr.Factory.newInstance() : pr;
+        if (pr == null) {
+            return;
+        }
+        this.sdtPr = pr;
+    }
+
+    public CTSdtPr getSdtPr() {
+        return sdtPr;
+    }
+
+    public void setSdtPr(CTSdtPr sdtPr) {
+        this.sdtPr = sdtPr;
     }
 
     /**
      * @return first SDT Title
      */
     public String getTitle() {
-        return pr.getAliasList().size() > 0
-                ? pr.getAliasList().get(0).getVal()
+        return sdtPr.getAliasList().size() > 0
+                ? sdtPr.getAliasList().get(0).getVal()
                 : null;
     }
 
     /**
-     * @author byy
      * @todo check is it good
      * @param title
      */
     public void setTitle(String title) {
-        if (pr != null) {
-            if (pr.getTagList().size() == 0) {
-                CTString cttag = CTString.Factory.newInstance();
-                cttag.setVal(title);
-                pr.getAliasList().add(cttag);
-            } else {
-                pr.getAliasList().get(0).setVal(title);
-            }
+        if (sdtPr.getAliasList().size() == 0) {
+            CTString cttag = CTString.Factory.newInstance();
+            cttag.setVal(title);
+            sdtPr.getAliasList().add(cttag);
+        } else {
+            sdtPr.getAliasList().get(0).setVal(title);
         }
     }
 
@@ -53,8 +53,8 @@ public class XWPFSDTPr {
      * @return first SDT Tag
      */
     public String getTag() {
-        return pr.getTagList().size() > 0
-                ? pr.getTagList().get(0).getVal()
+        return sdtPr.getTagList().size() > 0
+                ? sdtPr.getTagList().get(0).getVal()
                 : null;
     }
 
@@ -64,31 +64,27 @@ public class XWPFSDTPr {
      * @param tag
      */
     public void setTag(String tag) {
-        if (pr != null) {
-            if (pr.getTagList().size() == 0) {
-                CTString cttag = CTString.Factory.newInstance();
-                cttag.setVal(tag);
-                pr.getTagList().add(cttag);
-            } else {
-                pr.getTagList().get(0).setVal(tag);
-            }
+        if (sdtPr.getTagList().size() == 0) {
+            CTString cttag = CTString.Factory.newInstance();
+            cttag.setVal(tag);
+            sdtPr.getTagList().add(cttag);
+        } else {
+            sdtPr.getTagList().get(0).setVal(tag);
         }
     }
 
     public CTLock getLock() {
-        return pr.getLockList().size() > 0 ? pr.getLockList().get(0) : null;
+        return sdtPr.getLockList().size() > 0 ? sdtPr.getLockList().get(0) : null;
     }
 
     public void setLock(XWPFSDTLock.Enum lock) {
         STLock.Enum stLockEnum = XWPFSDTLock.locks.get(lock);
-        if (pr != null) {
-            if (pr.getLockList().size() == 0) {
-                CTLock ctLock = CTLock.Factory.newInstance();
-                ctLock.setVal(stLockEnum);
-                pr.getLockList().add(ctLock);
-            } else {
-                pr.getLockList().get(0).setVal(stLockEnum);
-            }
+        if (sdtPr.getLockList().size() == 0) {
+            CTLock ctLock = CTLock.Factory.newInstance();
+            ctLock.setVal(stLockEnum);
+            sdtPr.getLockList().add(ctLock);
+        } else {
+            sdtPr.getLockList().get(0).setVal(stLockEnum);
         }
     }
 }

@@ -17,6 +17,8 @@
 package org.apache.poi.xwpf.usermodel;
 
 import org.apache.poi.ooxml.POIXMLDocumentPart;
+import org.apache.poi.ss.formula.functions.T;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtContentRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
 
 /**
@@ -27,18 +29,14 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
  * These classes have so far been built only for read-only processing.
  */
 public abstract class XWPFAbstractSDT {
-    private XWPFSDTPr sdtPr;
+    protected XWPFSDTPr sdtPr;
 
-    public XWPFAbstractSDT(XWPFSDTPr sdtPr) {
-        this.sdtPr = sdtPr;
+    public XWPFAbstractSDT(CTSdtPr sdtPr) {
+        this.sdtPr = new XWPFSDTPr(sdtPr);
     }
 
     public XWPFSDTPr getSdtPr() {
-        return sdtPr;
-    }
-
-    public void setSdtPr(XWPFSDTPr sdtPr) {
-        this.sdtPr = sdtPr;
+        return this.sdtPr;
     }
 
     /**

@@ -1475,12 +1475,6 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         });
     }
 
-    public XWPFSDTRun replaceRunWithSdtRun(XWPFRun run) {
-        XWPFSDTRun sdtRun = new XWPFSDTRun(paragraph.addNewSdt(), (IRunBody)this);
-        sdtRun.addExistingRun(run);
-        return sdtRun;
-    }
-
     /**
      * Appends a new hyperlink run to this paragraph
      *
@@ -1652,19 +1646,9 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
                 newCursor.toParent();
             }
             if (isCursorInParagraph(newCursor)) {
-                // provide a new run
+                // provide a new sdt run
                 XWPFSDTRun newRun = provider.apply(newCursor);
-
-//                // To update the iruns, find where we're going
-//                // in the normal runs, and go in there
-//                int iPos = iruns.size();
-//                int oldAt = iruns.indexOf(run);
-//                if (oldAt != -1) {
-//                    iPos = oldAt;
-//                }
                 iruns.add(pos, newRun);
-                // Runs itself is easy to update
-//                runs.add(pos, newRun);
                 return newRun;
             }
             newCursor.dispose();

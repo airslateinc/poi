@@ -24,7 +24,7 @@ public class XWPFSDTBlock extends XWPFAbstractSDT
     protected List<IBodyElement> bodyElements;
 
     public XWPFSDTBlock(CTSdtBlock sdtBlock, IBody part) {
-        super(new XWPFSDTPr(sdtBlock.getSdtPr()));
+        super(sdtBlock.getSdtPr());
         this.sdtBlock = sdtBlock;
         this.part = part;
         this.content = new XWPFSDTContentBlock(sdtBlock.getSdtContent(), part);
