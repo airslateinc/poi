@@ -43,4 +43,9 @@ public abstract class XWPFAbstractSDT {
      * @return the content object
      */
     public abstract ISDTContent getContent();
+
+    /**
+     * @return create Properties for SDT
+     */
+    public abstract XWPFSDTPr createSdtPr();
 }

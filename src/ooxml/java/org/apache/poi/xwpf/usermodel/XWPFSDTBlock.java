@@ -7,39 +7,52 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtBlock;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @TODO check interfaces, update methods
  */
 public class XWPFSDTBlock extends XWPFAbstractSDT
-        implements IBodyElement, IRunBody, ISDTContentsBlock, IBody {
+        implements IBodyElement, IRunBody, ISDTContentsBlock {
 
     private CTSdtBlock sdtBlock;
-    private ISDTContent content;
+    private XWPFSDTContentBlock contentBlock;
     private IBody part;
 
-    protected List<XWPFParagraph> paragraphs;
-    protected List<XWPFTable> tables;
-    protected List<IBodyElement> bodyElements;
+//    protected List<XWPFParagraph> paragraphs;
+//    protected List<XWPFTable> tables;
+//    protected List<IBodyElement> bodyElements;
 
     public XWPFSDTBlock(CTSdtBlock sdtBlock, IBody part) {
         super(sdtBlock.getSdtPr());
+        this.contentBlock = new XWPFSDTContentBlock(sdtBlock.getSdtContent(), part);
         this.sdtBlock = sdtBlock;
         this.part = part;
-        this.content = new XWPFSDTContentBlock(sdtBlock.getSdtContent(), part);
     }
 
     @Override
-    public ISDTContent getContent() {
-        return content;
+    public XWPFSDTContentBlock getContent() {
+        return contentBlock;
     }
 
+    public XWPFSDTContentBlock createSdtContent() {
+        XWPFSDTContentBlock xwpfsdtContentBlock = new XWPFSDTContentBlock(this.sdtBlock.addNewSdtContent(), part);
+        this.contentBlock = xwpfsdtContentBlock;
+        return xwpfsdtContentBlock;
+    }
+
+    public XWPFSDTPr createSdtPr() {
+        XWPFSDTPr xwpfsdtPr = new XWPFSDTPr(this.sdtBlock.addNewSdtPr());
+        this.sdtPr = xwpfsdtPr;
+        return xwpfsdtPr;
+    }
     /**
      * @return null
      */
     public IBody getBody() {
-        return null;
+        return part;
     }
 
     /**
@@ -54,66 +67,6 @@ public class XWPFSDTBlock extends XWPFAbstractSDT
      */
     public BodyType getPartType() {
         return BodyType.CONTENTCONTROL;
-    }
-
-    @Override
-    public List<IBodyElement> getBodyElements() {
-        return null;
-    }
-
-    @Override
-    public List<XWPFParagraph> getParagraphs() {
-        return null;
-    }
-
-    @Override
-    public List<XWPFTable> getTables() {
-        return null;
-    }
-
-    @Override
-    public XWPFParagraph getParagraph(CTP p) {
-        return null;
-    }
-
-    @Override
-    public XWPFTable getTable(CTTbl ctTable) {
-        return null;
-    }
-
-    @Override
-    public XWPFParagraph getParagraphArray(int pos) {
-        return null;
-    }
-
-    @Override
-    public XWPFTable getTableArray(int pos) {
-        return null;
-    }
-
-    @Override
-    public XWPFParagraph insertNewParagraph(XmlCursor cursor) {
-        return null;
-    }
-
-    @Override
-    public XWPFTable insertNewTbl(XmlCursor cursor) {
-        return null;
-    }
-
-    @Override
-    public void insertTable(int pos, XWPFTable table) {
-
-    }
-
-    @Override
-    public XWPFTableCell getTableCell(CTTc cell) {
-        return null;
-    }
-
-    @Override
-    public XWPFDocument getXWPFDocument() {
-        return null;
     }
 
     /**

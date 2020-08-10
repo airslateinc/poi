@@ -5,15 +5,17 @@ import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class XWPFSDTContentBlock implements ISDTContent {
-    // private final IBody part;
+
     // private final XWPFDocument document;
-    // private List<XWPFParagraph> paragraphs = new ArrayList<>();
-    // private List<XWPFTable> tables = new ArrayList<>();
     // private List<XWPFSDT> contentControls = new ArrayList<>();
+    private IBody parent;
     private List<IBodyElement> bodyElements = new ArrayList<>();
+    private List<XWPFParagraph> paragraphs = new ArrayList<>();
+    private List<XWPFTable> tables = new ArrayList<>();
 
     public XWPFSDTContentBlock(CTSdtContentBlock block, IBody part) {
         if (block == null) {
@@ -26,18 +28,33 @@ public class XWPFSDTContentBlock implements ISDTContent {
             if (o instanceof CTP) {
                 XWPFParagraph p = new XWPFParagraph((CTP) o, part);
                 bodyElements.add(p);
-                // paragraphs.add(p);
+                paragraphs.add(p);
             } else if (o instanceof CTTbl) {
                 XWPFTable t = new XWPFTable((CTTbl) o, part);
                 bodyElements.add(t);
-                // tables.add(t);
+                tables.add(t);
             } else if (o instanceof CTSdtBlock) {
                 XWPFSDTBlock c = new XWPFSDTBlock(((CTSdtBlock) o), part);
                 bodyElements.add(c);
-                // contentControls.add(c);
+//                contentControls.add(c);
             }
         }
         cursor.dispose();
+    }
+
+//    @Override
+    public List<IBodyElement> getBodyElements() {
+        return Collections.unmodifiableList(bodyElements);
+    }
+
+//    @Override
+    public List<XWPFParagraph> getParagraphs() {
+        return Collections.unmodifiableList(paragraphs);
+    }
+
+//    @Override
+    public List<XWPFTable> getTables() {
+        return Collections.unmodifiableList(tables);
     }
 
     @Override

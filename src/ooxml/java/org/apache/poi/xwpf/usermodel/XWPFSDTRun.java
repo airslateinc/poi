@@ -28,6 +28,7 @@ public class XWPFSDTRun extends XWPFAbstractSDT
         return xwpfsdtContentRun;
     }
 
+    @Override
     public XWPFSDTPr createSdtPr() {
         XWPFSDTPr xwpfsdtPr = new XWPFSDTPr(this.sdtRun.addNewSdtPr());
         this.sdtPr = xwpfsdtPr;

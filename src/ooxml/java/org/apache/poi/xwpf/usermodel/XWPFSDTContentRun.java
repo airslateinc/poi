@@ -23,6 +23,7 @@ public class XWPFSDTContentRun implements ISDTContent {
         for (CTR ctr : this.ctContentRun.getRList()) {
             XWPFRun run = new XWPFRun(ctr, parent);
             runs.add(run);
+            iruns.add(run);
 //            bodyElements.add(run);
         }
     }

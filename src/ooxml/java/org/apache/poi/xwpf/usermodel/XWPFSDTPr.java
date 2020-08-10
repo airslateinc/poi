@@ -4,6 +4,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 /**
  * @author byy
+ * @TODO change behaviour for getters & setters when sdtPr is null
  * Rudimentary class for SDT processing
  * Represents Content Control properties
  */
@@ -30,6 +31,9 @@ public class XWPFSDTPr {
      * @return first SDT Title
      */
     public String getTitle() {
+        if (sdtPr == null || sdtPr.getAliasList() == null) {
+            return null;
+        }
         return sdtPr.getAliasList().size() > 0
                 ? sdtPr.getAliasList().get(0).getVal()
                 : null;
@@ -40,12 +44,14 @@ public class XWPFSDTPr {
      * @param title
      */
     public void setTitle(String title) {
-        if (sdtPr.getAliasList().size() == 0) {
-            CTString cttag = CTString.Factory.newInstance();
-            cttag.setVal(title);
-            sdtPr.getAliasList().add(cttag);
-        } else {
-            sdtPr.getAliasList().get(0).setVal(title);
+        if (sdtPr.getAliasList() != null) {
+            if (sdtPr.getAliasList().size() == 0) {
+                CTString cttag = sdtPr.addNewAlias();;
+                cttag.setVal(title);
+                sdtPr.setAliasArray(0, cttag);
+            } else {
+                sdtPr.getAliasList().get(0).setVal(title);
+            }
         }
     }
 
@@ -53,6 +59,9 @@ public class XWPFSDTPr {
      * @return first SDT Tag
      */
     public String getTag() {
+        if (sdtPr == null || sdtPr.getTagList() == null) {
+            return null;
+        }
         return sdtPr.getTagList().size() > 0
                 ? sdtPr.getTagList().get(0).getVal()
                 : null;
@@ -74,6 +83,9 @@ public class XWPFSDTPr {
     }
 
     public CTLock getLock() {
+        if (sdtPr == null || sdtPr.getLockList() == null) {
+            return null;
+        }
         return sdtPr.getLockList().size() > 0 ? sdtPr.getLockList().get(0) : null;
     }
 
