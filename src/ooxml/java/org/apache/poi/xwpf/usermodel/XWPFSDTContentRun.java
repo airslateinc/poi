@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class XWPFSDTContentRun implements ISDTContent {
+public class XWPFSDTContentRun implements ISDTContent, ISDTContentRun {
 
     private IRunBody parent;
     private CTSdtContentRun ctContentRun;
@@ -32,6 +32,15 @@ public class XWPFSDTContentRun implements ISDTContent {
         return Collections.unmodifiableList(iruns);
     }
 
+    public List<XWPFRun> getRuns() {
+        return Collections.unmodifiableList(runs);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param run
+     */
+    @Override
     public void createCopyOfExistingRunToSdtContent(XWPFRun run) {
         CTR ctr = ctContentRun.addNewR();
         ctr.set(run.getCTR());
@@ -40,10 +49,10 @@ public class XWPFSDTContentRun implements ISDTContent {
     }
 
     /**
-     * Appends a new run to SDT content
-     *
-     * @return a new text run
+     * {@inheritDoc}
+     * @return
      */
+    @Override
     public XWPFRun createRun() {
         XWPFRun xwpfRun = new XWPFRun(ctContentRun.addNewR(), parent);
         runs.add(xwpfRun);
@@ -74,5 +83,9 @@ public class XWPFSDTContentRun implements ISDTContent {
     @Override
     public String toString() {
         return getText();
+    }
+
+    public CTSdtContentRun getCtContentRun() {
+        return ctContentRun;
     }
 }

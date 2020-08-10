@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class XWPFSDTContentBlock implements ISDTContent {
+public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
 
     // private final XWPFDocument document;
     // private List<XWPFSDT> contentControls = new ArrayList<>();
@@ -52,9 +52,146 @@ public class XWPFSDTContentBlock implements ISDTContent {
         return Collections.unmodifiableList(paragraphs);
     }
 
-//    @Override
+    @Override
+    public XWPFParagraph getParagraph(CTP p) {
+        for (int i = 0; i < getParagraphs().size(); i++) {
+            if (getParagraphs().get(i).getCTP() == p) {
+                return getParagraphs().get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * verifies that cursor is on the right position
+     *
+     * @param cursor
+     */
+    private boolean isCursorInSdtContentBlock(XmlCursor cursor) {
+        XmlCursor verify = cursor.newCursor();
+        verify.toParent();
+        boolean result = (verify.getObject() == this);
+        verify.dispose();
+        return result;
+    }
+
+    @Override
+    public XWPFParagraph insertNewParagraph(XmlCursor cursor) {
+        if (isCursorInSdtContentBlock(cursor)) {
+            String uri = CTP.type.getName().getNamespaceURI();
+            String localPart = "p";
+            // creates a new Paragraph, cursor is positioned inside the new
+            // element
+            cursor.beginElement(localPart, uri);
+            // move the cursor to the START token to the paragraph just created
+            cursor.toParent();
+            CTP p = (CTP) cursor.getObject();
+            XWPFParagraph newP = new XWPFParagraph(p, parent);
+            XmlObject o = null;
+            /*
+             * move the cursor to the previous element until a) the next
+             * paragraph is found or b) all elements have been passed
+             */
+            while (!(o instanceof CTP) && (cursor.toPrevSibling())) {
+                o = cursor.getObject();
+            }
+            /*
+             * if the object that has been found is a) not a paragraph or b) is
+             * the paragraph that has just been inserted, as the cursor in the
+             * while loop above was not moved as there were no other siblings,
+             * then the paragraph that was just inserted is the first paragraph
+             * in the body. Otherwise, take the previous paragraph and calculate
+             * the new index for the new paragraph.
+             */
+            if ((!(o instanceof CTP)) || o == p) {
+                paragraphs.add(0, newP);
+            } else {
+                int pos = paragraphs.indexOf(getParagraph((CTP) o)) + 1;
+                paragraphs.add(pos, newP);
+            }
+
+            /*
+             * create a new cursor, that points to the START token of the just
+             * inserted paragraph
+             */
+            XmlCursor newParaPos = p.newCursor();
+            try {
+                /*
+                 * Calculate the paragraphs index in the list of all body
+                 * elements
+                 */
+                int i = 0;
+                cursor.toCursor(newParaPos);
+                while (cursor.toPrevSibling()) {
+                    o = cursor.getObject();
+                    if (o instanceof CTP || o instanceof CTTbl) {
+                        i++;
+                    }
+                }
+                bodyElements.add(i, newP);
+                cursor.toCursor(newParaPos);
+                cursor.toEndToken();
+                return newP;
+            } finally {
+                newParaPos.dispose();
+            }
+        }
+        return null;
+    }
+
+    //    @Override
     public List<XWPFTable> getTables() {
         return Collections.unmodifiableList(tables);
+    }
+
+    @Override
+    public XWPFTable getTable(CTTbl ctTbl) {
+        for (int i = 0; i < tables.size(); i++) {
+            if (getTables().get(i).getCTTbl() == ctTbl) {
+                return getTables().get(i);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public XWPFTable insertNewTbl(XmlCursor cursor) {
+        if (isCursorInSdtContentBlock(cursor)) {
+            String uri = CTTbl.type.getName().getNamespaceURI();
+            String localPart = "tbl";
+            cursor.beginElement(localPart, uri);
+            cursor.toParent();
+            CTTbl t = (CTTbl) cursor.getObject();
+            XWPFTable newT = new XWPFTable(t, parent);
+            XmlObject o = null;
+            while (!(o instanceof CTTbl) && (cursor.toPrevSibling())) {
+                o = cursor.getObject();
+            }
+            if (!(o instanceof CTTbl)) {
+                tables.add(0, newT);
+            } else {
+                int pos = tables.indexOf(getTable((CTTbl) o)) + 1;
+                tables.add(pos, newT);
+            }
+            int i = 0;
+            XmlCursor tableCursor = t.newCursor();
+            try {
+                cursor.toCursor(tableCursor);
+                while (cursor.toPrevSibling()) {
+                    o = cursor.getObject();
+                    if (o instanceof CTP || o instanceof CTTbl) {
+                        i++;
+                    }
+                }
+                bodyElements.add(i, newT);
+                cursor.toCursor(tableCursor);
+                cursor.toEndToken();
+                return newT;
+            } finally {
+                tableCursor.dispose();
+            }
+        }
+        return null;
     }
 
     @Override

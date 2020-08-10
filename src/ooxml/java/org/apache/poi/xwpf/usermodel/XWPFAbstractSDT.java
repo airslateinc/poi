@@ -48,4 +48,9 @@ public abstract class XWPFAbstractSDT {
      * @return create Properties for SDT
      */
     public abstract XWPFSDTPr createSdtPr();
+
+    /**
+     * @return create Properties for SDT
+     */
+    public abstract ISDTContent createSdtContent();
 }

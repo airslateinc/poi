@@ -6,14 +6,14 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
 public class XWPFSDTRun extends XWPFAbstractSDT
         implements IRunBody, IRunElement, ISDTContentsRun {
 
-    private CTSdtRun sdtRun;
+    private CTSdtRun ctSdtRun;
     private XWPFSDTContentRun contentRun;
     private IRunBody parent;
 
     public XWPFSDTRun(CTSdtRun ctSdtRun, IRunBody parent) {
         super(ctSdtRun.getSdtPr());
         this.contentRun = new XWPFSDTContentRun(ctSdtRun.getSdtContent(), this);
-        this.sdtRun = ctSdtRun;
+        this.ctSdtRun = ctSdtRun;
         this.parent = parent;
     }
 
@@ -23,14 +23,14 @@ public class XWPFSDTRun extends XWPFAbstractSDT
     }
 
     public XWPFSDTContentRun createSdtContent() {
-        XWPFSDTContentRun xwpfsdtContentRun = new XWPFSDTContentRun(this.sdtRun.addNewSdtContent(), this);
+        XWPFSDTContentRun xwpfsdtContentRun = new XWPFSDTContentRun(this.ctSdtRun.addNewSdtContent(), this);
         this.contentRun = xwpfsdtContentRun;
         return xwpfsdtContentRun;
     }
 
     @Override
     public XWPFSDTPr createSdtPr() {
-        XWPFSDTPr xwpfsdtPr = new XWPFSDTPr(this.sdtRun.addNewSdtPr());
+        XWPFSDTPr xwpfsdtPr = new XWPFSDTPr(this.ctSdtRun.addNewSdtPr());
         this.sdtPr = xwpfsdtPr;
         return xwpfsdtPr;
     }
@@ -43,5 +43,9 @@ public class XWPFSDTRun extends XWPFAbstractSDT
     @Override
     public POIXMLDocumentPart getPart() {
         return parent.getPart();
+    }
+
+    public CTSdtRun getCtSdtRun() {
+        return ctSdtRun;
     }
 }
