@@ -149,6 +149,24 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
         return null;
     }
 
+    public XWPFParagraph copyAndInsertExistingParagraph(XWPFParagraph paragraph) {
+        CTP ctp = ctSdtContentBlock.addNewP();
+        ctp.set(paragraph.getCTP());
+        XWPFParagraph p = new XWPFParagraph(ctp, parent);
+        paragraphs.add(p);
+        bodyElements.add(p);
+        return p;
+    }
+
+    public XWPFTable copyAndInsertExistingTable(XWPFTable xwpfTable) {
+        CTTbl ctTbl = ctSdtContentBlock.addNewTbl();
+        ctTbl.set(xwpfTable.getCTTbl());
+        XWPFTable tbl = new XWPFTable(ctTbl, parent);
+        tables.add(tbl);
+        bodyElements.add(tbl);
+        return tbl;
+    }
+
     @Override
     public XWPFTable getTable(CTTbl ctTbl) {
         for (int i = 0; i < tables.size(); i++) {

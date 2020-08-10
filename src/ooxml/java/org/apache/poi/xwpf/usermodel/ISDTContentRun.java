@@ -9,5 +9,5 @@ public interface ISDTContentRun {
      */
     XWPFRun createRun();
 
-    void createCopyOfExistingRunToSdtContent(XWPFRun run);
+    XWPFRun copyAndInsertExistingRun(XWPFRun run);
 }

@@ -6,8 +6,6 @@ import org.junit.Test;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static org.apache.poi.POITestCase.assertContains;
@@ -108,13 +106,14 @@ public final class TestXWPFSDTRun {
         sdtPr.setLock(XWPFSDTLock.Enum.SDT_CONTENT_LOCKED);
 
         // copy existing run to sdt content & remove run from Paragraph
-        sdtContent.createCopyOfExistingRunToSdtContent(run);
+        sdtContent.copyAndInsertExistingRun(run);
 
         cur.toChild(1); // move to SdtContent
         cur.toFirstChild(); // select copied run
 
         assertTrue(cur.getObject() instanceof CTR);
         assertEquals("second ",  new XWPFRun((CTR) cur.getObject(), sdtRun).getText(0));
+        assertEquals("Times New Roman",  new XWPFRun((CTR) cur.getObject(), sdtRun).getFontFamily());
 
         p.removeRun(p.getRuns().indexOf(run));
 

@@ -95,6 +95,55 @@ public final class TestXWPFSDTBlock {
         assertSame(newP, sdtBlock.getContent().getParagraphs().get(0));
     }
 
+    @Test
+    public void testInsertExistingParagraphToSdtContentBlock() {
+        XWPFDocument doc = new XWPFDocument();
+        doc.createParagraph().createRun().setText("Some text1");
+        XWPFSDTBlock sdtBlock = doc.createSdt();
+        XWPFSDTContentBlock sdtBlockContent = sdtBlock.createSdtContent();
+        sdtBlockContent.copyAndInsertExistingParagraph(
+                doc.getParagraphs().get(0)
+        );
+
+        assertEquals("Some text1", sdtBlockContent.getParagraphs().get(0).getText());
+        assertEquals(1, sdtBlockContent.getParagraphs().size());
+        assertEquals(1, sdtBlockContent.getBodyElements().size());
+    }
+
+    @Test
+    public void testInsertExistingTblToSdtContentBlock() {
+        XWPFDocument doc = new XWPFDocument();
+        doc.createTable().createRow().createCell().addParagraph().createRun().setText("Deep in Tbl");
+        XWPFSDTBlock sdtBlock = doc.createSdt();
+        XWPFSDTContentBlock sdtBlockContent = sdtBlock.createSdtContent();
+        sdtBlockContent.copyAndInsertExistingTable(
+                doc.getTables().get(0)
+        );
+
+        assertEquals("Deep in Tbl", sdtBlockContent.getTables().get(0).getText().trim());
+        assertEquals(1, sdtBlockContent.getTables().size());
+        assertEquals(1, sdtBlockContent.getBodyElements().size());
+    }
+
+    @Test
+    public void testInsertNewTblToSdtBlockContent() throws IOException {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
+        XWPFSDTBlock sdtBlock = (XWPFSDTBlock) doc.getBodyElements().get(2);
+
+        XmlCursor cur = sdtBlock.getContent().getCtSdtContentBlock().newCursor();
+        cur.toFirstChild(); // move cursor to Tbl
+        cur.toEndToken(); // move cursor to the end of Tbl
+        cur.toNextToken(); // move cursor fight after the Tbl
+
+        assertEquals(1, sdtBlock.getContent().getTables().size());
+
+        XWPFTable newTbl = sdtBlock.getContent().insertNewTbl(cur);
+
+        assertEquals(2, sdtBlock.getContent().getTables().size());
+        assertEquals(3, sdtBlock.getContent().getBodyElements().size());
+        assertSame(newTbl, sdtBlock.getContent().getTables().get(1));
+    }
+
     /**
      * Verify that existing Content Control in document is correctly
      * unmarshalled & we can proceed with modifying its content

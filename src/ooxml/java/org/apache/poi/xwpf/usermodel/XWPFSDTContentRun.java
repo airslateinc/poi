@@ -41,11 +41,12 @@ public class XWPFSDTContentRun implements ISDTContent, ISDTContentRun {
      * @param run
      */
     @Override
-    public void createCopyOfExistingRunToSdtContent(XWPFRun run) {
+    public XWPFRun copyAndInsertExistingRun(XWPFRun run) {
         CTR ctr = ctContentRun.addNewR();
         ctr.set(run.getCTR());
-        XWPFRun xwpfRun = new XWPFRun(ctr, parent);
-        iruns.add(xwpfRun);
+        XWPFRun r = new XWPFRun(ctr, parent);
+        iruns.add(r);
+        return r;
     }
 
     /**
