@@ -13,6 +13,7 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
     // private final XWPFDocument document;
     // private List<XWPFSDT> contentControls = new ArrayList<>();
     private IBody parent;
+    private CTSdtContentBlock ctSdtContentBlock;
     private List<IBodyElement> bodyElements = new ArrayList<>();
     private List<XWPFParagraph> paragraphs = new ArrayList<>();
     private List<XWPFTable> tables = new ArrayList<>();
@@ -21,6 +22,9 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
         if (block == null) {
             return;
         }
+        this.ctSdtContentBlock = block;
+        this.parent = part;
+
         XmlCursor cursor = block.newCursor();
         cursor.selectPath("./*");
         while (cursor.toNextSelection()) {
@@ -42,14 +46,20 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
         cursor.dispose();
     }
 
-//    @Override
+    public CTSdtContentBlock getCtSdtContentBlock() {
+        return ctSdtContentBlock;
+    }
+
     public List<IBodyElement> getBodyElements() {
         return Collections.unmodifiableList(bodyElements);
     }
 
-//    @Override
     public List<XWPFParagraph> getParagraphs() {
         return Collections.unmodifiableList(paragraphs);
+    }
+
+    public List<XWPFTable> getTables() {
+        return Collections.unmodifiableList(tables);
     }
 
     @Override
@@ -70,7 +80,7 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
     private boolean isCursorInSdtContentBlock(XmlCursor cursor) {
         XmlCursor verify = cursor.newCursor();
         verify.toParent();
-        boolean result = (verify.getObject() == this);
+        boolean result = (verify.getObject() == this.ctSdtContentBlock);
         verify.dispose();
         return result;
     }
@@ -137,11 +147,6 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
             }
         }
         return null;
-    }
-
-    //    @Override
-    public List<XWPFTable> getTables() {
-        return Collections.unmodifiableList(tables);
     }
 
     @Override

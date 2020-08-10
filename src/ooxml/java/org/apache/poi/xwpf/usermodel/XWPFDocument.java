@@ -860,6 +860,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     public XWPFSDTBlock createSdt() {
         XWPFSDTBlock sdt = new XWPFSDTBlock(ctDocument.getBody().addNewSdt(), this);
         bodyElements.add(sdt);
+        contentControls.add(sdt);
         return sdt;
     }
 

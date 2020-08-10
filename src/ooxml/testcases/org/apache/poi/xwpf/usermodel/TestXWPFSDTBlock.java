@@ -1,55 +1,109 @@
 package org.apache.poi.xwpf.usermodel;
 
 import org.apache.poi.xwpf.XWPFTestDataSamples;
+import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
 import org.junit.Test;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtBlock;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtContentBlock;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtPr;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.poi.POITestCase.assertContains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+/**
+ * Test class for manipulation of block level Content Controls.
+ * Related classes are:
+ *      {@link XWPFSDTBlock}, {@link XWPFSDTPr}, {@link XWPFSDTContentBlock}
+ */
 public final class TestXWPFSDTBlock {
 
+    /**
+     * Verify that Sdt Block Pr is added to Sdt Block
+     * and the related object references were updated
+     */
     @Test
-    public void testCreateSdtFromScratch() {
+    public void testCreateSdtBlockPr() {
         XWPFDocument doc = new XWPFDocument();
+        XWPFSDTBlock sdtBlock = doc.createSdt();
 
-        XWPFParagraph p1 = doc.createParagraph();
-        XWPFRun r1 = p1.createRun();
-        r1.setText("First paragraph text");
+        XmlCursor cur = doc.getDocument().newCursor();
+        cur.toFirstChild(); // move cursor to Body
+        cur.toFirstChild(); // move cursor to SDT
+        assertTrue(cur.getObject() instanceof CTSdtBlock);
 
-        XWPFSDTBlock block1 = doc.createSdt();
+        XWPFSDTPr sdtBlockPr = sdtBlock.createSdtPr();
 
-
-        XWPFParagraph p2 = doc.createParagraph();
-        XWPFRun r2 = p2.createRun();
-        r2.setText("Second paragraph text");
-
-        XWPFParagraph p3 = doc.createParagraph();
-        XWPFRun r3 = p3.createRun();
-        r3.setText("Third paragraph text");
-
-        System.out.println(doc.getDocument().getBody().toString());
-    }
-
-    public void testElementsStructureInsideSdtBlock() throws Exception {
-        // todo
+        cur.toFirstChild();
+        assertTrue(cur.getObject() instanceof CTSdtPr);
     }
 
     /**
-     * Test SdtPr get/set tag, title, lock for SdtBlock
+     * Verify that Sdt Block Content is added to Sdt Block
+     * and the related object references were updated
+     */
+    @Test
+    public void testCreateSdtContentBlock() {
+        XWPFDocument doc = new XWPFDocument();
+        XWPFSDTBlock sdtBlock = doc.createSdt();
+
+        XmlCursor cur = doc.getDocument().newCursor();
+        cur.toFirstChild(); // move cursor to Body
+        cur.toFirstChild(); // move cursor to SDT
+        assertTrue(cur.getObject() instanceof CTSdtBlock);
+
+        XWPFSDTContentBlock sdtBlockContent = sdtBlock.createSdtContent();
+
+        cur.toFirstChild();
+        assertTrue(cur.getObject() instanceof CTSdtContentBlock);
+    }
+
+    @Test
+    public void testGetParagraphFromSdtBlockContent() throws IOException {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
+        XWPFSDTBlock sdtBlock = (XWPFSDTBlock) doc.getBodyElements().get(2);
+
+        CTP p = sdtBlock.getContent().getParagraphs().get(0).getCTP();
+        assertSame(
+                sdtBlock.getContent().getParagraphs().get(0),
+                sdtBlock.getContent().getParagraph(p)
+        );
+    }
+
+    @Test
+    public void testInsertNewParagraphToSdtBlockContent() throws IOException {
+        XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
+        XWPFSDTBlock sdtBlock = (XWPFSDTBlock) doc.getBodyElements().get(2);
+
+        XmlCursor cur = sdtBlock.getContent().getCtSdtContentBlock().newCursor();
+        cur.toFirstChild(); // move cursor to Tbl
+        cur.toEndToken(); // move cursor to the end of Tbl
+        cur.toNextToken(); // move cursor fight after the Tbl
+
+        assertEquals(1, sdtBlock.getContent().getParagraphs().size());
+
+        XWPFParagraph newP = sdtBlock.getContent().insertNewParagraph(cur);
+
+        assertEquals(2, sdtBlock.getContent().getParagraphs().size());
+        assertEquals(3, sdtBlock.getContent().getBodyElements().size());
+        assertSame(newP, sdtBlock.getContent().getParagraphs().get(0));
+    }
+
+    /**
+     * Verify that existing Content Control in document is correctly
+     * unmarshalled & we can proceed with modifying its content
      * @throws Exception
      */
     @Test
-    public void testSdtPrForBlock() throws Exception {
+    public void testUnmarshallingSdtBlock() throws Exception {
         XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("blockAndInlineSdtTags.docx");
-
-        XWPFAbstractSDT sdtBlock = (XWPFAbstractSDT) doc.getBodyElements().get(2);
-
-        assertTrue(sdtBlock instanceof XWPFSDTBlock);
+        XWPFSDTBlock sdtBlock = (XWPFSDTBlock) doc.getBodyElements().get(2);
 
         // Tag
         assertEquals("block-sdt-tag", sdtBlock.getSdtPr().getTag());
@@ -68,5 +122,17 @@ public final class TestXWPFSDTBlock {
 
         sdtBlock.getSdtPr().setLock(XWPFSDTLock.Enum.UNLOCKED);
         assertEquals(XWPFSDTLock.locks.get(XWPFSDTLock.Enum.UNLOCKED), sdtBlock.getSdtPr().getLock().getVal());
+
+        // SdtContent
+        assertEquals(
+                "Some content1",
+                sdtBlock.getContent()
+                        .getTables()
+                        .get(0)
+                        .getRows()
+                        .get(0)
+                        .getCell(0)
+                        .getText()
+        );
     }
 }

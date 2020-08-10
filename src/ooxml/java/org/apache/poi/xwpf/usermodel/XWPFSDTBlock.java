@@ -1,15 +1,7 @@
 package org.apache.poi.xwpf.usermodel;
 
 import org.apache.poi.ooxml.POIXMLDocumentPart;
-import org.apache.xmlbeans.XmlCursor;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtBlock;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @TODO check interfaces, update methods
@@ -17,18 +9,14 @@ import java.util.List;
 public class XWPFSDTBlock extends XWPFAbstractSDT
         implements IBodyElement, IRunBody, ISDTContentsBlock {
 
-    private CTSdtBlock sdtBlock;
+    private CTSdtBlock ctSdtBlock;
     private XWPFSDTContentBlock contentBlock;
     private IBody part;
-
-//    protected List<XWPFParagraph> paragraphs;
-//    protected List<XWPFTable> tables;
-//    protected List<IBodyElement> bodyElements;
 
     public XWPFSDTBlock(CTSdtBlock sdtBlock, IBody part) {
         super(sdtBlock.getSdtPr());
         this.contentBlock = new XWPFSDTContentBlock(sdtBlock.getSdtContent(), part);
-        this.sdtBlock = sdtBlock;
+        this.ctSdtBlock = sdtBlock;
         this.part = part;
     }
 
@@ -38,13 +26,13 @@ public class XWPFSDTBlock extends XWPFAbstractSDT
     }
 
     public XWPFSDTContentBlock createSdtContent() {
-        XWPFSDTContentBlock xwpfsdtContentBlock = new XWPFSDTContentBlock(this.sdtBlock.addNewSdtContent(), part);
+        XWPFSDTContentBlock xwpfsdtContentBlock = new XWPFSDTContentBlock(this.ctSdtBlock.addNewSdtContent(), part);
         this.contentBlock = xwpfsdtContentBlock;
         return xwpfsdtContentBlock;
     }
 
     public XWPFSDTPr createSdtPr() {
-        XWPFSDTPr xwpfsdtPr = new XWPFSDTPr(this.sdtBlock.addNewSdtPr());
+        XWPFSDTPr xwpfsdtPr = new XWPFSDTPr(this.ctSdtBlock.addNewSdtPr());
         this.sdtPr = xwpfsdtPr;
         return xwpfsdtPr;
     }
@@ -78,5 +66,9 @@ public class XWPFSDTBlock extends XWPFAbstractSDT
 
     public XWPFDocument getDocument() {
         return part.getXWPFDocument();
+    }
+
+    public CTSdtBlock getCtSdtBlock() {
+        return ctSdtBlock;
     }
 }
