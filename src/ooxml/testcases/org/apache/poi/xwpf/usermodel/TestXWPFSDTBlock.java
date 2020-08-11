@@ -84,7 +84,7 @@ public final class TestXWPFSDTBlock {
         XmlCursor cur = sdtBlock.getContent().getCtSdtContentBlock().newCursor();
         cur.toFirstChild(); // move cursor to Tbl
         cur.toEndToken(); // move cursor to the end of Tbl
-        cur.toNextToken(); // move cursor fight after the Tbl
+        cur.toNextToken(); // move cursor right after the Tbl
 
         assertEquals(1, sdtBlock.getContent().getParagraphs().size());
 
@@ -93,6 +93,32 @@ public final class TestXWPFSDTBlock {
         assertEquals(2, sdtBlock.getContent().getParagraphs().size());
         assertEquals(3, sdtBlock.getContent().getBodyElements().size());
         assertSame(newP, sdtBlock.getContent().getParagraphs().get(0));
+    }
+
+    @Test
+    public void testInsertSdtBlockInDocument() {
+        XWPFDocument doc = new XWPFDocument();
+
+        // create few elements in body
+        XWPFParagraph p = doc.createParagraph();
+        p.createRun().setText("Text in first paragraph");
+        doc.createTable().createRow().createCell().addParagraph().createRun().setText("Text in Tbl cell");
+
+        XmlCursor cur = p.getCTP().newCursor();
+        cur.toEndToken();
+        cur.toNextToken(); // move cursor right after the Paragraph
+
+        XWPFSDTBlock sdtBlock = doc.insertNewSdtBlock(cur);
+
+        assertEquals(3, doc.getBodyElements().size());
+        assertEquals(1, doc.getSdtBlocks().size());
+
+        cur = p.getCTP().newCursor();
+        cur.toEndToken();
+        cur.toNextToken();
+
+        // verify that Sdt Block is inserted
+        assertTrue(cur.getObject() instanceof CTSdtBlock);
     }
 
     @Test

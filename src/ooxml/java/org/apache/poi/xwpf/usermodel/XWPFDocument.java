@@ -108,7 +108,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     protected List<XWPFHyperlink> hyperlinks = new ArrayList<>();
     protected List<XWPFParagraph> paragraphs = new ArrayList<>();
     protected List<XWPFTable> tables = new ArrayList<>();
-    protected List<XWPFAbstractSDT> contentControls = new ArrayList<>();
+    protected List<XWPFSDTBlock> contentControls = new ArrayList<>();
     protected List<IBodyElement> bodyElements = new ArrayList<>();
     protected List<XWPFPictureData> pictures = new ArrayList<>();
     protected Map<Long, List<XWPFPictureData>> packagePictures = new HashMap<>();
@@ -354,6 +354,14 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     @Override
     public List<XWPFTable> getTables() {
         return Collections.unmodifiableList(tables);
+    }
+
+    /**
+     * @see org.apache.poi.xwpf.usermodel.IBody#getSdtBlocks()
+     */
+//    @Override
+    public List<XWPFSDTBlock> getSdtBlocks() {
+        return Collections.unmodifiableList(contentControls);
     }
 
     /**
@@ -711,7 +719,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 cursor.toCursor(newParaPos);
                 while (cursor.toPrevSibling()) {
                     o = cursor.getObject();
-                    if (o instanceof CTP || o instanceof CTTbl) {
+                    if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock) {
                         i++;
                     }
                 }
@@ -751,7 +759,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 cursor.toCursor(tableCursor);
                 while (cursor.toPrevSibling()) {
                     o = cursor.getObject();
-                    if (o instanceof CTP || o instanceof CTTbl) {
+                    if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock) {
                         i++;
                     }
                 }
@@ -761,6 +769,52 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 return newT;
             } finally {
                 tableCursor.dispose();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the comments for code in the method:
+     * {@link org.apache.poi.xwpf.usermodel.XWPFDocument#insertNewParagraph(org.apache.xmlbeans.XmlCursor)}
+     * @param cursor
+     * @return
+     */
+    @Override
+    public XWPFSDTBlock insertNewSdtBlock(XmlCursor cursor) {
+        if (isCursorInBody(cursor)) {
+            String uri = CTSdtBlock.type.getName().getNamespaceURI();
+            String localPart = "sdt";
+            cursor.beginElement(localPart, uri);
+            cursor.toParent();
+            CTSdtBlock sdt = (CTSdtBlock) cursor.getObject();
+            XWPFSDTBlock newSdtBlock = new XWPFSDTBlock(sdt, this);
+            XmlObject o = null;
+            while (!(o instanceof CTSdtBlock) && (cursor.toPrevSibling())) {
+                o = cursor.getObject();
+            }
+            if (!(o instanceof CTSdtBlock)) {
+                contentControls.add(0, newSdtBlock);
+            } else {
+                int pos = contentControls.indexOf(getSdtBlock((CTSdtBlock) o)) + 1;
+                contentControls.add(pos, newSdtBlock);
+            }
+            int i = 0;
+            XmlCursor sdtCursor = sdt.newCursor();
+            try {
+                cursor.toCursor(sdtCursor);
+                while (cursor.toPrevSibling()) {
+                    o = cursor.getObject();
+                    if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock) {
+                        i++;
+                    }
+                }
+                bodyElements.add(i, newSdtBlock);
+                cursor.toCursor(sdtCursor);
+                cursor.toEndToken();
+                return newSdtBlock;
+            } finally {
+                sdtCursor.dispose();
             }
         }
         return null;
@@ -1581,6 +1635,23 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
         for (int i = 0; i < tables.size(); i++) {
             if (getTables().get(i).getCTTbl() == ctTbl) {
                 return getTables().get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * get an SDT Block by its CtSdtBlock-Object
+     *
+     * @param ctSdtBlock
+     * @return a table by its CTTbl-Object or null
+     * @see org.apache.poi.xwpf.usermodel.IBody#getTable(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl)
+     */
+//    @Override
+    public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
+        for (int i = 0; i < contentControls.size(); i++) {
+            if (getTables().get(i).getCTTbl() == ctSdtBlock) {
+                return getSdtBlocks().get(i);
             }
         }
         return null;

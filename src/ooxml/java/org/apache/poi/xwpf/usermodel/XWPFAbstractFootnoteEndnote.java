@@ -42,7 +42,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
  * {@link XWPFFootnotes} and end notes are managed by the Endnotes part {@link XWPFEndnotes}.</p>
  * @since 4.0.0
  */
-public abstract class XWPFAbstractFootnoteEndnote  implements Iterable<XWPFParagraph>, IBody {
+public abstract class XWPFAbstractFootnoteEndnote  implements Iterable<XWPFParagraph>, IBody{
 
     private List<XWPFParagraph> paragraphs = new ArrayList<>();
     private List<XWPFTable> tables = new ArrayList<>();

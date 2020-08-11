@@ -29,7 +29,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtBlock;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSdtRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTShd;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
@@ -69,6 +68,7 @@ public class XWPFTableCell implements IBody, ICell {
     protected List<XWPFParagraph> paragraphs;
     protected List<XWPFTable> tables;
     protected List<IBodyElement> bodyElements;
+    protected List<XWPFSDTBlock> sdtBlocks;
 
     protected IBody part;
     private XWPFTableRow tableRow;
@@ -103,6 +103,7 @@ public class XWPFTableCell implements IBody, ICell {
             }
             if (o instanceof CTSdtBlock) {
                 XWPFSDTBlock c = new XWPFSDTBlock((CTSdtBlock) o, this);
+                sdtBlocks.add(c);
                 bodyElements.add(c);
             }
         }
@@ -333,6 +334,11 @@ public class XWPFTableCell implements IBody, ICell {
         return null;
     }
 
+    @Override
+    public XWPFSDTBlock insertNewSdtBlock(XmlCursor cursor) {
+        return null;
+    }
+
     /**
      * verifies that cursor is on the right position
      */
@@ -382,6 +388,16 @@ public class XWPFTableCell implements IBody, ICell {
         return null;
     }
 
+    @Override
+    public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
+        for (int i = 0; i < sdtBlocks.size(); i++) {
+            if (getTables().get(i).getCTTbl() == ctSdtBlock) {
+                return getSdtBlocks().get(i);
+            }
+        }
+        return null;
+    }
+
     /**
      * @see org.apache.poi.xwpf.usermodel.IBody#getTableArray(int)
      */
@@ -397,6 +413,11 @@ public class XWPFTableCell implements IBody, ICell {
      */
     public List<XWPFTable> getTables() {
         return Collections.unmodifiableList(tables);
+    }
+
+    @Override
+    public List<XWPFSDTBlock> getSdtBlocks() {
+        return Collections.unmodifiableList(sdtBlocks);
     }
 
     /**
