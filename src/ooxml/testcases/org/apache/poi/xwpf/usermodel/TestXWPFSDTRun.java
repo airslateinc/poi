@@ -90,16 +90,24 @@ public final class TestXWPFSDTRun {
         p.createRun().setText("third ");
 
         // get position of run & insert sdt element before
-        XWPFSDTRun sdtRun = p.insertNewSDTRunBeforeRun(run);
+        XWPFSDTRun sdtRunBefore = p.insertNewSdtRunByIRunPos(run, p.getIRuns().indexOf(run));
+        XWPFSDTRun sdtRunAfter = p.insertNewSdtRunByIRunPos(run, p.getIRuns().indexOf(run) + 1);
 
         cur = p.getCTP().newCursor();
         cur.toChild(1);
+        cur.push();
+
         // verify that second element in paragraph is SDT
         assertTrue(cur.getObject() instanceof CTSdtRun);
 
-        // create PR & Content for SDT
-        XWPFSDTPr sdtPr = sdtRun.createSdtPr();
-        XWPFSDTContentRun sdtContent = sdtRun.createSdtContent();
+        cur.toNextSibling(); // to next R
+        cur.toNextSibling(); // to Sdt after R
+
+        assertTrue(cur.getObject() instanceof CTSdtRun);
+
+        // create Pr & Content for SDT
+        XWPFSDTPr sdtPr = sdtRunBefore.createSdtPr();
+        XWPFSDTContentRun sdtContent = sdtRunBefore.createSdtContent();
 
         sdtPr.setTag("new-inline-tag");
         sdtPr.setTitle("new-inline-title");
@@ -108,18 +116,18 @@ public final class TestXWPFSDTRun {
         // copy existing run to sdt content & remove run from Paragraph
         sdtContent.copyAndInsertExistingRun(run);
 
+        cur.pop();
         cur.toChild(1); // move to SdtContent
         cur.toFirstChild(); // select copied run
 
         assertTrue(cur.getObject() instanceof CTR);
-        assertEquals("second ",  new XWPFRun((CTR) cur.getObject(), sdtRun).getText(0));
-        assertEquals("Times New Roman",  new XWPFRun((CTR) cur.getObject(), sdtRun).getFontFamily());
+        assertEquals("second ",  new XWPFRun((CTR) cur.getObject(), sdtRunBefore).getText(0));
+        assertEquals("Times New Roman",  new XWPFRun((CTR) cur.getObject(), sdtRunBefore).getFontFamily());
 
-        p.removeRun(p.getRuns().indexOf(run));
-
-        assertEquals(3, p.getIRuns().size());
-        assertEquals(2, p.getRuns().size());
+        assertEquals(5, p.getIRuns().size());
+        assertEquals(3, p.getRuns().size());
         assertEquals(XWPFSDTRun.class, p.getIRuns().get(1).getClass());
+        assertEquals(XWPFSDTRun.class, p.getIRuns().get(3).getClass());
     }
 
     /**

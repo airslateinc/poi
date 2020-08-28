@@ -1457,8 +1457,8 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         return sdtRun;
     }
 
-    public XWPFSDTRun insertNewSDTRunBeforeRun(XWPFRun run) {
-        int pos = iruns.indexOf(run);
+    public XWPFSDTRun insertNewSdtRunByIRunPos(XWPFRun run, int irunPos) {
+        int pos = irunPos;
         if (pos == iruns.size()) {
             return createSdtRun();
         }
@@ -1636,8 +1636,8 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
      * @return the inserted run or null if the given pos is out of bounds.
      */
     private XWPFSDTRun insertNewProvidedSdtRun(int pos, Function<XmlCursor, XWPFSDTRun> provider) {
-        if (pos >= 0 && pos < runs.size()) {
-            XWPFRun run = runs.get(pos);
+        if (pos >= 0 && pos < iruns.size()) {
+            XWPFRun run = (XWPFRun) iruns.get(pos);
             CTR ctr = run.getCTR();
 
             XmlCursor newCursor = ctr.newCursor();
