@@ -1650,7 +1650,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
 //    @Override
     public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
         for (int i = 0; i < contentControls.size(); i++) {
-            if (getTables().get(i).getCTTbl() == ctSdtBlock) {
+            if (getSdtBlocks().get(i).getCtSdtBlock() == ctSdtBlock) {
                 return getSdtBlocks().get(i);
             }
         }
