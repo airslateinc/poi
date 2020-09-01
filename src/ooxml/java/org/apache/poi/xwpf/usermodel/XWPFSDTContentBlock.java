@@ -149,6 +149,30 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
         return null;
     }
 
+    /**
+     * Appends a new paragraph to this document
+     *
+     * @return a new paragraph
+     */
+    public XWPFParagraph createParagraph() {
+        XWPFParagraph p = new XWPFParagraph(ctSdtContentBlock.addNewP(), parent);
+        bodyElements.add(p);
+        paragraphs.add(p);
+        return p;
+    }
+
+    /**
+     * Create an empty table with one row and one column as default.
+     *
+     * @return a new table
+     */
+    public XWPFTable createTable() {
+        XWPFTable table = new XWPFTable(ctSdtContentBlock.addNewTbl(), parent);
+        bodyElements.add(table);
+        tables.add(table);
+        return table;
+    }
+
     public XWPFParagraph copyAndInsertExistingParagraph(XWPFParagraph paragraph) {
         CTP ctp = ctSdtContentBlock.addNewP();
         ctp.set(paragraph.getCTP());
