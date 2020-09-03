@@ -173,6 +173,30 @@ public class XWPFTableCell implements IBody, ICell {
     }
 
     /**
+     * removes a Table of this tablecell
+     *
+     * @param pos The position in the list of tables, 0-based
+     */
+    public void removeTable(int pos) {
+        XWPFTable removedTable = tables.get(pos);
+        tables.remove(pos);
+        ctTc.removeTbl(pos);
+        bodyElements.remove(removedTable);
+    }
+
+    /**
+     * removes a SDT Block of this tablecell
+     *
+     * @param pos The position in the list of SDT Blocks, 0-based
+     */
+    public void removeSdtBlock(int pos) {
+        XWPFSDTBlock removedSdt = sdtBlocks.get(pos);
+        sdtBlocks.remove(pos);
+        ctTc.removeSdt(pos);
+        bodyElements.remove(removedSdt);
+    }
+
+    /**
      * if there is a corresponding {@link XWPFParagraph} of the parameter ctTable in the paragraphList of this table
      * the method will return this paragraph
      * if there is no corresponding {@link XWPFParagraph} the method will return null
@@ -525,6 +549,28 @@ public class XWPFTableCell implements IBody, ICell {
 
     public XWPFDocument getXWPFDocument() {
         return part.getXWPFDocument();
+    }
+
+    @Override
+    public boolean removeBodyElement(int pos) {
+        if (pos >= 0 && pos < bodyElements.size()) {
+            IBodyElement bodyElement = bodyElements.get(pos);
+            BodyElementType type = bodyElement.getElementType();
+            if (type == BodyElementType.TABLE) {
+                int tablePos = tables.indexOf(bodyElement);
+                removeTable(tablePos);
+            }
+            if (type == BodyElementType.PARAGRAPH) {
+                int paraPos = paragraphs.indexOf(bodyElement);
+                removeParagraph(paraPos);
+            }
+            if (type == BodyElementType.CONTENTCONTROL) {
+                int sdtPos = sdtBlocks.indexOf(bodyElement);
+                removeSdtBlock(sdtPos);
+            }
+            return true;
+        }
+        return false;
     }
 
     // Create a map from this XWPF-level enum to the STVerticalJc.Enum values

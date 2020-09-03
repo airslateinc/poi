@@ -32,11 +32,7 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTHdrFtr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 /**
  * Parent of XWPF headers and footers
@@ -46,6 +42,7 @@ public abstract class XWPFHeaderFooter extends POIXMLDocumentPart implements IBo
     List<XWPFTable> tables = new ArrayList<>();
     List<XWPFPictureData> pictures = new ArrayList<>();
     List<IBodyElement> bodyElements = new ArrayList<>();
+    List<XWPFSDTBlock> sdtBlocks = new ArrayList<>();
 
     CTHdrFtr headerFooter;
     XWPFDocument document;
@@ -360,6 +357,41 @@ public abstract class XWPFHeaderFooter extends POIXMLDocumentPart implements IBo
             tables.remove(table);
             bodyElements.remove(table);
         }
+    }
+
+    /**
+     * Remove a specific SDT Block from this header / footer
+     *
+     * @param sdt - {@link XWPFSDTBlock} object to remove
+     */
+    public void removeSdtBlock(XWPFSDTBlock sdt) {
+        if (sdtBlocks.contains(sdt)) {
+            CTSdtBlock ctSdtBlock = sdt.getCtSdtBlock();
+            XmlCursor c = ctSdtBlock.newCursor();
+            c.removeXml();
+            c.dispose();
+            sdtBlocks.remove(ctSdtBlock);
+            bodyElements.remove(ctSdtBlock);
+        }
+    }
+
+    @Override
+    public boolean removeBodyElement(int pos) {
+        if (pos >= 0 && pos < bodyElements.size()) {
+            IBodyElement bodyElement = bodyElements.get(pos);
+            BodyElementType type = bodyElement.getElementType();
+            if (type == BodyElementType.TABLE) {
+                removeTable((XWPFTable) bodyElement);
+            }
+            if (type == BodyElementType.PARAGRAPH) {
+                removeParagraph((XWPFParagraph) bodyElement);
+            }
+            if (type == BodyElementType.CONTENTCONTROL) {
+                removeSdtBlock((XWPFSDTBlock) bodyElement);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**

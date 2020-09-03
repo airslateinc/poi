@@ -48,6 +48,8 @@ public abstract class XWPFAbstractFootnoteEndnote  implements Iterable<XWPFParag
     private List<XWPFTable> tables = new ArrayList<>();
     private List<XWPFPictureData> pictures = new ArrayList<>();
     private List<IBodyElement> bodyElements = new ArrayList<>();
+    private List<XWPFSDTBlock> sdtBlocks = new ArrayList<>();
+
     protected CTFtnEdn ctFtnEdn;
     protected XWPFAbstractFootnotesEndnotes footnotes;
     protected XWPFDocument document;
@@ -510,6 +512,17 @@ public abstract class XWPFAbstractFootnoteEndnote  implements Iterable<XWPFParag
         bodyElements.add(table);
         tables.add(table);
         return table;
+    }
+
+    /**
+     * Unimplemented method
+     *
+     * @param pos
+     * @return
+     */
+    @Override
+    public boolean removeBodyElement(int pos) {
+        return false;
     }
 
 }

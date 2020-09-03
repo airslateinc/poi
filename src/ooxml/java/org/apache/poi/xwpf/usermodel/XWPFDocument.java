@@ -1009,6 +1009,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
      * @param pos
      * @return true if removing was successfully, else return false
      */
+    @Override
     public boolean removeBodyElement(int pos) {
         if (pos >= 0 && pos < bodyElements.size()) {
             BodyElementType type = bodyElements.get(pos).getElementType();
@@ -1022,10 +1023,30 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 paragraphs.remove(paraPos);
                 ctDocument.getBody().removeP(paraPos);
             }
+            if (type == BodyElementType.CONTENTCONTROL) {
+                removeSdtBlock((XWPFSDTBlock) bodyElements.get(pos));
+                return true;
+            }
             bodyElements.remove(pos);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Remove a specific SDT Block from this header / footer
+     *
+     * @param sdt - {@link XWPFSDTBlock} object to remove
+     */
+    public void removeSdtBlock(XWPFSDTBlock sdt) {
+        if (contentControls.contains(sdt)) {
+            CTSdtBlock ctSdtBlock = sdt.getCtSdtBlock();
+            XmlCursor c = ctSdtBlock.newCursor();
+            c.removeXml();
+            c.dispose();
+            contentControls.remove(ctSdtBlock);
+            bodyElements.remove(ctSdtBlock);
+        }
     }
 
     /**

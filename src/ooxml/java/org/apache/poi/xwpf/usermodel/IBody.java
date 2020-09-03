@@ -155,4 +155,11 @@ public interface IBody {
      * Return XWPFDocument
      */
     public XWPFDocument getXWPFDocument();
+
+    /**
+     * Remove element from BodyElements
+     * @param pos
+     * @return
+     */
+    public boolean removeBodyElement(int pos);
 }
