@@ -86,6 +86,7 @@ public class XWPFTableCell implements IBody, ICell {
         bodyElements = new ArrayList<>();
         paragraphs = new ArrayList<>();
         tables = new ArrayList<>();
+        sdtBlocks = new ArrayList<>();
 
         XmlCursor cursor = ctTc.newCursor();
         cursor.selectPath("./*");
