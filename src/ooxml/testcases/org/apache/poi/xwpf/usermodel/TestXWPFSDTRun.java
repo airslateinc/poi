@@ -90,8 +90,8 @@ public final class TestXWPFSDTRun {
         p.createRun().setText("third ");
 
         // get position of run & insert sdt element before
-        XWPFSDTRun sdtRunBefore = p.insertNewSdtRunByIRunPos(run, p.getIRuns().indexOf(run));
-        XWPFSDTRun sdtRunAfter = p.insertNewSdtRunByIRunPos(run, p.getIRuns().indexOf(run) + 1);
+        XWPFSDTRun sdtRunBefore = p.insertNewSdtRunByIRunPos(p.getIRuns().indexOf(run));
+        XWPFSDTRun sdtRunAfter = p.insertNewSdtRunByIRunPos(p.getIRuns().indexOf(run) + 1);
 
         cur = p.getCTP().newCursor();
         cur.toChild(1);

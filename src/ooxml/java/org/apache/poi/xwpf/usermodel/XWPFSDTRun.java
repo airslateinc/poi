@@ -35,6 +35,15 @@ public class XWPFSDTRun extends XWPFAbstractSDT
         return xwpfsdtPr;
     }
 
+    /**
+     * Get the currently referenced paragraph/SDT object
+     *
+     * @return current parent
+     */
+    public IRunBody getParent() {
+        return parent;
+    }
+
     @Override
     public XWPFDocument getDocument() {
         return parent.getDocument();

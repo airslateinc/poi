@@ -1457,7 +1457,7 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         return sdtRun;
     }
 
-    public XWPFSDTRun insertNewSdtRunByIRunPos(XWPFRun run, int irunPos) {
+    public XWPFSDTRun insertNewSdtRunByIRunPos(int irunPos) {
         int pos = irunPos;
         if (pos == iruns.size()) {
             return createSdtRun();
@@ -1818,6 +1818,47 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
             runs.remove(pos);
             iruns.remove(run);
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Remove Sdt Run by its position in iruns collection
+     *
+     * @param irunPos
+     * @return true if element was removed
+     */
+    public boolean removeSdtRun(int irunPos) {
+        if (irunPos >= 0 && irunPos < iruns.size()) {
+            IRunElement sdtRun = iruns.get(irunPos);
+
+            if (sdtRun instanceof XWPFSDTRun) {
+                XmlCursor c = ((XWPFSDTRun) sdtRun).getCtSdtRun().newCursor();
+                c.removeXml();
+                c.dispose();
+                iruns.remove(sdtRun);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Removes elements {@link XWPFSDTRun}, {@link XWPFRun} from iruns collection
+     *
+     * @param irunPos
+     * @return true if element was removed
+     */
+    public boolean removeIRunElement(int irunPos) {
+        if (irunPos >= 0 && irunPos < iruns.size()) {
+            IRunElement iRunElement = iruns.get(irunPos);
+
+            if (iRunElement instanceof XWPFSDTRun) {
+                return removeSdtRun(irunPos);
+            }
+            if (iRunElement instanceof XWPFRun) {
+                return removeRun(runs.indexOf(iRunElement));
+            }
         }
         return false;
     }

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.ooxml.POIXMLDocumentPart;
+import org.apache.poi.ss.formula.eval.NotImplementedException;
 import org.apache.poi.util.Internal;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -522,7 +523,7 @@ public abstract class XWPFAbstractFootnoteEndnote  implements Iterable<XWPFParag
      */
     @Override
     public boolean removeBodyElement(int pos) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
 }
