@@ -1,5 +1,7 @@
 package org.apache.poi.xwpf.usermodel;
 
+import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 import java.util.ArrayList;
@@ -20,12 +22,7 @@ public class XWPFSDTContentRun implements ISDTContent, ISDTContentRun {
         this.ctContentRun = ctContentRun;
         this.parent = parent;
 
-        for (CTR ctr : this.ctContentRun.getRList()) {
-            XWPFRun run = new XWPFRun(ctr, parent);
-            runs.add(run);
-            iruns.add(run);
-//            bodyElements.add(run);
-        }
+        buildRunsInOrderFromXml(this.ctContentRun);
     }
 
     public List<IRunElement> getIRuns() {
@@ -34,6 +31,58 @@ public class XWPFSDTContentRun implements ISDTContent, ISDTContentRun {
 
     public List<XWPFRun> getRuns() {
         return Collections.unmodifiableList(runs);
+    }
+
+    private void buildRunsInOrderFromXml(XmlObject object) {
+        XmlCursor c = object.newCursor();
+        c.selectPath("child::*");
+        while (c.toNextSelection()) {
+            XmlObject o = c.getObject();
+            if (o instanceof CTR) {
+                XWPFRun r = new XWPFRun((CTR) o, parent);
+                runs.add(r);
+                iruns.add(r);
+            }
+            if (o instanceof CTHyperlink) {
+                CTHyperlink link = (CTHyperlink)o;
+                for (CTR r : link.getRArray()) {
+                    XWPFHyperlinkRun hr = new XWPFHyperlinkRun(link, r, parent);
+                    runs.add(hr);
+                    iruns.add(hr);
+                }
+            }
+            if (o instanceof CTSimpleField) {
+                CTSimpleField field = (CTSimpleField)o;
+                for (CTR r : field.getRArray()) {
+                    XWPFFieldRun fr = new XWPFFieldRun(field, r, parent);
+                    runs.add(fr);
+                    iruns.add(fr);
+                }
+            }
+            if (o instanceof CTSdtRun) {
+                XWPFSDTRun cc = new XWPFSDTRun((CTSdtRun) o, parent);
+                iruns.add(cc);
+            }
+            if (o instanceof CTRunTrackChange) {
+                for (CTR r : ((CTRunTrackChange) o).getRArray()) {
+                    XWPFRun cr = new XWPFRun(r, parent);
+                    runs.add(cr);
+                    iruns.add(cr);
+                }
+            }
+            if (o instanceof CTSmartTagRun) {
+                // Smart Tags can be nested many times.
+                // This implementation does not preserve the tagging information
+                buildRunsInOrderFromXml(o);
+            }
+            if (o instanceof CTRunTrackChange) {
+                // add all the insertions as text
+                for (CTRunTrackChange change : ((CTRunTrackChange) o).getInsArray()) {
+                    buildRunsInOrderFromXml(change);
+                }
+            }
+        }
+        c.dispose();
     }
 
     /**
