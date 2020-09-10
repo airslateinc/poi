@@ -87,19 +87,6 @@ public class XWPFSDTContentRun implements ISDTContent, ISDTContentRun {
 
     /**
      * {@inheritDoc}
-     * @param run
-     */
-    @Override
-    public XWPFRun copyAndInsertExistingRun(XWPFRun run) {
-        CTR ctr = ctContentRun.addNewR();
-        ctr.set(run.getCTR());
-        XWPFRun r = new XWPFRun(ctr, parent);
-        iruns.add(r);
-        return r;
-    }
-
-    /**
-     * {@inheritDoc}
      * @return
      */
     @Override
@@ -108,6 +95,29 @@ public class XWPFSDTContentRun implements ISDTContent, ISDTContentRun {
         runs.add(xwpfRun);
         iruns.add(xwpfRun);
         return xwpfRun;
+    }
+
+    @Override
+    public IRunElement cloneExistingIRunElement(IRunElement elem) {
+        if (elem instanceof XWPFRun) {
+            CTR ctr = ctContentRun.addNewR();
+            ctr.set(((XWPFRun) elem).getCTR());
+            XWPFRun r = new XWPFRun(ctr, parent);
+            runs.add(r);
+            iruns.add(r);
+            return r;
+        }
+        return null;
+    }
+
+    /**
+     * Implementation may be based on {@link XWPFParagraph#removeRun(int)}
+     * @param pos
+     * @return
+     */
+    @Override
+    public boolean removeIRunElement(int pos) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

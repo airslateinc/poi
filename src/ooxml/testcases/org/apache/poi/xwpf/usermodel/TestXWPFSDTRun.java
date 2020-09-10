@@ -114,7 +114,7 @@ public final class TestXWPFSDTRun {
         sdtPr.setLock(XWPFSDTLock.Enum.SDT_CONTENT_LOCKED);
 
         // copy existing run to sdt content & remove run from Paragraph
-        sdtContent.copyAndInsertExistingRun(run);
+        sdtContent.cloneExistingIRunElement(run);
 
         cur.pop();
         cur.toChild(1); // move to SdtContent
