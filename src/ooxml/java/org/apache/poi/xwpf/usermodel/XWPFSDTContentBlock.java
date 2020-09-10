@@ -173,24 +173,6 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
         return table;
     }
 
-    public XWPFParagraph copyAndInsertExistingParagraph(XWPFParagraph paragraph) {
-        CTP ctp = ctSdtContentBlock.addNewP();
-        ctp.set(paragraph.getCTP());
-        XWPFParagraph p = new XWPFParagraph(ctp, parent);
-        paragraphs.add(p);
-        bodyElements.add(p);
-        return p;
-    }
-
-    public XWPFTable copyAndInsertExistingTable(XWPFTable xwpfTable) {
-        CTTbl ctTbl = ctSdtContentBlock.addNewTbl();
-        ctTbl.set(xwpfTable.getCTTbl());
-        XWPFTable tbl = new XWPFTable(ctTbl, parent);
-        tables.add(tbl);
-        bodyElements.add(tbl);
-        return tbl;
-    }
-
     @Override
     public XWPFTable getTable(CTTbl ctTbl) {
         for (int i = 0; i < tables.size(); i++) {
@@ -239,6 +221,31 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
             }
         }
         return null;
+    }
+
+    @Override
+    public IBodyElement cloneExistingIBodyElement(IBodyElement elem) {
+        if (elem instanceof XWPFParagraph) {
+            CTP ctp = ctSdtContentBlock.addNewP();
+            ctp.set(((XWPFParagraph) elem).getCTP());
+            XWPFParagraph p = new XWPFParagraph(ctp, parent);
+            paragraphs.add(p);
+            bodyElements.add(p);
+            return p;
+        } else if (elem instanceof XWPFTable) {
+            CTTbl ctTbl = ctSdtContentBlock.addNewTbl();
+            ctTbl.set(((XWPFTable) elem).getCTTbl());
+            XWPFTable tbl = new XWPFTable(ctTbl, parent);
+            tables.add(tbl);
+            bodyElements.add(tbl);
+            return tbl;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean removeIBodyElement(int pos) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

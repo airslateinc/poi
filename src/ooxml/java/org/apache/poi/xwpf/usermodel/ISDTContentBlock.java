@@ -54,4 +54,19 @@ public interface ISDTContentBlock {
 
     XWPFTable insertNewTbl(XmlCursor cursor);
 
+    /**
+     * Clone existing {@link IBodyElement} to content & return ref to it
+     *
+     * @param elem
+     * @return
+     */
+    IBodyElement cloneExistingIBodyElement(IBodyElement elem);
+
+    /**
+     * Removes {@link IBodyElement} from content by its position in {@link XWPFSDTContentBlock#bodyElements}
+     *
+     * @param pos
+     * @return
+     */
+    boolean removeIBodyElement(int pos);
 }

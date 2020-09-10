@@ -127,7 +127,7 @@ public final class TestXWPFSDTBlock {
         doc.createParagraph().createRun().setText("Some text1");
         XWPFSDTBlock sdtBlock = doc.createSdt();
         XWPFSDTContentBlock sdtBlockContent = sdtBlock.createSdtContent();
-        sdtBlockContent.copyAndInsertExistingParagraph(
+        sdtBlockContent.cloneExistingIBodyElement(
                 doc.getParagraphs().get(0)
         );
 
@@ -142,7 +142,7 @@ public final class TestXWPFSDTBlock {
         doc.createTable().createRow().createCell().addParagraph().createRun().setText("Deep in Tbl");
         XWPFSDTBlock sdtBlock = doc.createSdt();
         XWPFSDTContentBlock sdtBlockContent = sdtBlock.createSdtContent();
-        sdtBlockContent.copyAndInsertExistingTable(
+        sdtBlockContent.cloneExistingIBodyElement(
                 doc.getTables().get(0)
         );
 
