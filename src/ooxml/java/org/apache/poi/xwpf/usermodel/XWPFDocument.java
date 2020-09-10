@@ -655,6 +655,18 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     }
 
     /**
+     * get with the position of a table in the bodyelement array list
+     * the position of this SDT in the contentControls array list
+     *
+     * @param pos position of the SDT in the bodyelement array list
+     * @return if there is a table at the position in the bodyelement array list,
+     * else it will return null.
+     */
+    public int getSDTPos(int pos) {
+        return getBodyElementSpecificPos(pos, contentControls);
+    }
+
+    /**
      * Add a new paragraph at position of the cursor. The cursor must be on the
      * {@link org.apache.xmlbeans.XmlCursor.TokenType#START} tag of an subelement
      * of the documents body. When this method is done, the cursor passed as
@@ -1024,29 +1036,14 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 ctDocument.getBody().removeP(paraPos);
             }
             if (type == BodyElementType.CONTENTCONTROL) {
-                removeSdtBlock((XWPFSDTBlock) bodyElements.get(pos));
-                return true;
+                int sdtPos = getSDTPos(pos);
+                contentControls.remove(sdtPos);
+                ctDocument.getBody().removeSdt(sdtPos);
             }
             bodyElements.remove(pos);
             return true;
         }
         return false;
-    }
-
-    /**
-     * Remove a specific SDT Block from this header / footer
-     *
-     * @param sdt - {@link XWPFSDTBlock} object to remove
-     */
-    public void removeSdtBlock(XWPFSDTBlock sdt) {
-        if (contentControls.contains(sdt)) {
-            CTSdtBlock ctSdtBlock = sdt.getCtSdtBlock();
-            XmlCursor c = ctSdtBlock.newCursor();
-            c.removeXml();
-            c.dispose();
-            contentControls.remove(ctSdtBlock);
-            bodyElements.remove(ctSdtBlock);
-        }
     }
 
     /**
