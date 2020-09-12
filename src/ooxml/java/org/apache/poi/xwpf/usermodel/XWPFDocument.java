@@ -359,7 +359,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
     /**
      * @see org.apache.poi.xwpf.usermodel.IBody#getSdtBlocks()
      */
-//    @Override
+    @Override
     public List<XWPFSDTBlock> getSdtBlocks() {
         return Collections.unmodifiableList(contentControls);
     }
@@ -1665,7 +1665,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
      * @return a table by its CTTbl-Object or null
      * @see org.apache.poi.xwpf.usermodel.IBody#getTable(org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl)
      */
-//    @Override
+    @Override
     public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
         for (int i = 0; i < contentControls.size(); i++) {
             if (getSdtBlocks().get(i).getCtSdtBlock() == ctSdtBlock) {

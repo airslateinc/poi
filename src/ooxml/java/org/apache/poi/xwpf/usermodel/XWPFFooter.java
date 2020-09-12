@@ -129,19 +129,4 @@ public class XWPFFooter extends XWPFHeaderFooter {
     public BodyType getPartType() {
         return BodyType.FOOTER;
     }
-
-    @Override
-    public List<XWPFSDTBlock> getSdtBlocks() {
-        return null;
-    }
-
-    @Override
-    public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
-        return null;
-    }
-
-    @Override
-    public XWPFSDTBlock insertNewSdtBlock(XmlCursor cursor) {
-        return null;
-    }
 }

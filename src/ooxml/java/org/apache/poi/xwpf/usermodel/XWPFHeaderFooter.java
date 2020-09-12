@@ -105,6 +105,73 @@ public abstract class XWPFHeaderFooter extends POIXMLDocumentPart implements IBo
         return Collections.unmodifiableList(paragraphs);
     }
 
+    @Override
+    public List<XWPFSDTBlock> getSdtBlocks() {
+        return Collections.unmodifiableList(sdtBlocks);
+    }
+
+    @Override
+    public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
+        for (int i = 0; i < sdtBlocks.size(); i++) {
+            if (getSdtBlocks().get(i).getCtSdtBlock() == ctSdtBlock) {
+                return getSdtBlocks().get(i);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public XWPFSDTBlock insertNewSdtBlock(XmlCursor cursor) {
+        if (isCursorInBody(cursor)) {
+            String uri = CTSdtBlock.type.getName().getNamespaceURI();
+            String localPart = "sdt";
+            cursor.beginElement(localPart, uri);
+            cursor.toParent();
+            CTSdtBlock sdt = (CTSdtBlock) cursor.getObject();
+            XWPFSDTBlock newSdtBlock = new XWPFSDTBlock(sdt, this);
+            XmlObject o = null;
+            while (!(o instanceof CTSdtBlock) && (cursor.toPrevSibling())) {
+                o = cursor.getObject();
+            }
+            if (!(o instanceof CTSdtBlock)) {
+                sdtBlocks.add(0, newSdtBlock);
+            } else {
+                int pos = sdtBlocks.indexOf(getSdtBlock((CTSdtBlock) o)) + 1;
+                sdtBlocks.add(pos, newSdtBlock);
+            }
+            int i = 0;
+            XmlCursor sdtCursor = sdt.newCursor();
+            try {
+                cursor.toCursor(sdtCursor);
+                while (cursor.toPrevSibling()) {
+                    o = cursor.getObject();
+                    if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock) {
+                        i++;
+                    }
+                }
+                bodyElements.add(i, newSdtBlock);
+                cursor.toCursor(sdtCursor);
+                cursor.toEndToken();
+                return newSdtBlock;
+            } finally {
+                sdtCursor.dispose();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * verifies that cursor is on the right position
+     *
+     * @param cursor
+     */
+    private boolean isCursorInBody(XmlCursor cursor) {
+        XmlCursor verify = cursor.newCursor();
+        verify.toParent();
+        boolean result = (verify.getObject() == this.headerFooter);
+        verify.dispose();
+        return result;
+    }
 
     /**
      * Return the table(s) that holds the text
