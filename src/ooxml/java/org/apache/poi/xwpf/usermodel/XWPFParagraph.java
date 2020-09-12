@@ -1637,10 +1637,20 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
      */
     private XWPFSDTRun insertNewProvidedSdtRun(int pos, Function<XmlCursor, XWPFSDTRun> provider) {
         if (pos >= 0 && pos < iruns.size()) {
-            XWPFRun run = (XWPFRun) iruns.get(pos);
-            CTR ctr = run.getCTR();
+            IRunElement runElement = iruns.get(pos);
+            XmlCursor newCursor = null;
+            if (runElement instanceof XWPFRun) {
+                XWPFRun run = (XWPFRun) iruns.get(pos);
+                CTR ctr = run.getCTR();
+                newCursor = ctr.newCursor();
+            } else if (runElement instanceof XWPFSDTRun) {
+                XWPFSDTRun run = (XWPFSDTRun) iruns.get(pos);
+                CTSdtRun ctr = run.getCtSdtRun();
+                newCursor = ctr.newCursor();
+            } else {
+                throw new RuntimeException("Can't process element " + runElement.getClass());
+            }
 
-            XmlCursor newCursor = ctr.newCursor();
             if (!isCursorInParagraph(newCursor)) {
                 // look up correct position for CTP -> XXX -> R array
                 newCursor.toParent();
