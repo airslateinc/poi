@@ -1061,6 +1061,11 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
          */
     }
 
+    public void setSDTBlock(int pos, XWPFSDTBlock sdt) {
+        contentControls.set(pos, sdt);
+        ctDocument.getBody().setSdtArray(pos, sdt.getCtSdtBlock());
+    }
+
     /**
      * @return the LastParagraph of the document
      */

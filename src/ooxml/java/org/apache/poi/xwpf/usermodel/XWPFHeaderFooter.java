@@ -160,6 +160,11 @@ public abstract class XWPFHeaderFooter extends POIXMLDocumentPart implements IBo
         return null;
     }
 
+    public void setSDTBlock(int pos, XWPFSDTBlock sdt) {
+        sdtBlocks.set(pos, sdt);
+        headerFooter.setSdtArray(pos, sdt.getCtSdtBlock());
+    }
+
     /**
      * verifies that cursor is on the right position
      *
