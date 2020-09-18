@@ -132,6 +132,11 @@ public class XWPFTableCell implements IBody, ICell {
         ctTc.setPArray(0, p.getCTP());
     }
 
+    public void setSDTBlock(int pos, XWPFSDTBlock sdt) {
+        sdtBlocks.set(pos, sdt);
+        ctTc.setSdtArray(pos, sdt.getCtSdtBlock());
+    }
+
     /**
      * returns a list of paragraphs
      */
@@ -311,7 +316,7 @@ public class XWPFTableCell implements IBody, ICell {
         p2.dispose();
         while (cursor.toPrevSibling()) {
             o = cursor.getObject();
-            if (o instanceof CTP || o instanceof CTTbl)
+            if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock)
                 i++;
         }
         bodyElements.add(i, newP);
@@ -345,7 +350,7 @@ public class XWPFTableCell implements IBody, ICell {
             XmlCursor cursor2 = t.newCursor();
             while (cursor2.toPrevSibling()) {
                 o = cursor2.getObject();
-                if (o instanceof CTP || o instanceof CTTbl)
+                if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock)
                     i++;
             }
             cursor2.dispose();
@@ -361,6 +366,41 @@ public class XWPFTableCell implements IBody, ICell {
 
     @Override
     public XWPFSDTBlock insertNewSdtBlock(XmlCursor cursor) {
+        if (isCursorInTableCell(cursor)) {
+            String uri = CTSdtBlock.type.getName().getNamespaceURI();
+            String localPart = "sdt";
+            cursor.beginElement(localPart, uri);
+            cursor.toParent();
+            CTSdtBlock sdt = (CTSdtBlock) cursor.getObject();
+            XWPFSDTBlock newSdtBlock = new XWPFSDTBlock(sdt, this);
+            XmlObject o = null;
+            while (!(o instanceof CTSdtBlock) && (cursor.toPrevSibling())) {
+                o = cursor.getObject();
+            }
+            if (!(o instanceof CTSdtBlock)) {
+                sdtBlocks.add(0, newSdtBlock);
+            } else {
+                int pos = sdtBlocks.indexOf(getSdtBlock((CTSdtBlock) o)) + 1;
+                sdtBlocks.add(pos, newSdtBlock);
+            }
+            int i = 0;
+            XmlCursor sdtCursor = sdt.newCursor();
+            try {
+                cursor.toCursor(sdtCursor);
+                while (cursor.toPrevSibling()) {
+                    o = cursor.getObject();
+                    if (o instanceof CTP || o instanceof CTTbl || o instanceof CTSdtBlock) {
+                        i++;
+                    }
+                }
+                bodyElements.add(i, newSdtBlock);
+                cursor.toCursor(sdtCursor);
+                cursor.toEndToken();
+                return newSdtBlock;
+            } finally {
+                sdtCursor.dispose();
+            }
+        }
         return null;
     }
 
