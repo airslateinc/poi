@@ -827,6 +827,7 @@ public class XWPFDocument extends POIXMLDocument implements Document, IBody {
                 return newSdtBlock;
             } finally {
                 sdtCursor.dispose();
+                cursor.dispose();
             }
         }
         return null;

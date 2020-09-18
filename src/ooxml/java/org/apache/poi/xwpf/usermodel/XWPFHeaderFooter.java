@@ -155,6 +155,7 @@ public abstract class XWPFHeaderFooter extends POIXMLDocumentPart implements IBo
                 return newSdtBlock;
             } finally {
                 sdtCursor.dispose();
+                cursor.dispose();
             }
         }
         return null;

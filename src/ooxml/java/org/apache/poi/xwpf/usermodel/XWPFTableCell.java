@@ -399,6 +399,7 @@ public class XWPFTableCell implements IBody, ICell {
                 return newSdtBlock;
             } finally {
                 sdtCursor.dispose();
+                cursor.dispose();
             }
         }
         return null;
