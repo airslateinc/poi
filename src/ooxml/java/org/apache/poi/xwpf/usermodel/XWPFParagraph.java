@@ -46,6 +46,7 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
     protected XWPFDocument document;
     protected List<XWPFRun> runs;
     protected List<IRunElement> iruns;
+    protected List<XWPFSDTRun> sdtRuns;
 
     private StringBuilder footnoteText = new StringBuilder(64);
 
@@ -62,6 +63,7 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         // Build up the character runs
         runs = new ArrayList<>();
         iruns = new ArrayList<>();
+        sdtRuns = new ArrayList<>();
         buildRunsInOrderFromXml(paragraph);
 
         // Look for bits associated with the runs
@@ -135,6 +137,7 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
             }
             if (o instanceof CTSdtRun) {
                 XWPFSDTRun cc = new XWPFSDTRun((CTSdtRun) o, this);
+                sdtRuns.add(cc);
                 iruns.add(cc);
             }
             if (o instanceof CTRunTrackChange) {
@@ -175,6 +178,10 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
      */
     public List<IRunElement> getIRuns() {
         return Collections.unmodifiableList(iruns);
+    }
+
+    public List<XWPFSDTRun> getSDTRuns() {
+        return Collections.unmodifiableList(sdtRuns);
     }
 
     public boolean isEmpty() {
@@ -1425,7 +1432,6 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
                 : paragraph.getPPr();
     }
 
-
     /**
      * add a new run at the end of the position of
      * the content of parameter run
@@ -1451,28 +1457,16 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         return xwpfRun;
     }
 
-    public XWPFSDTRun createSdtRun() {
-        XWPFSDTRun sdtRun = new XWPFSDTRun(paragraph.addNewSdt(), (IRunBody)this);
-        iruns.add(sdtRun);
-        return sdtRun;
+    public void setSDTRun(int pos, XWPFSDTRun sdt) {
+        sdtRuns.set(pos, sdt);
+        paragraph.setSdtArray(pos, sdt.getCtSdtRun());
     }
 
-    public XWPFSDTRun insertNewSdtRunByIRunPos(int irunPos) {
-        int pos = irunPos;
-        if (pos == iruns.size()) {
-            return createSdtRun();
-        }
-        return insertNewProvidedSdtRun(pos, newCursor -> {
-            String uri = CTSdtRun.type.getName().getNamespaceURI();
-            String localPart = "sdt";
-            // creates a new sdt run, cursor is positioned inside the new
-            // element
-            newCursor.beginElement(localPart, uri);
-            // move the cursor to the START token to the run just created
-            newCursor.toParent();
-            CTSdtRun sdtRun = (CTSdtRun) newCursor.getObject();
-            return new XWPFSDTRun(sdtRun, (IRunBody)this);
-        });
+    public XWPFSDTRun createSdtRun() {
+        XWPFSDTRun sdtRun = new XWPFSDTRun(paragraph.addNewSdt(), (IRunBody)this);
+        sdtRuns.add(sdtRun);
+        iruns.add(sdtRun);
+        return sdtRun;
     }
 
     /**
@@ -1629,39 +1623,56 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
     }
 
     /**
-     * insert a new run provided by  in all runs
+     * Insert new sdt run by cursor. update iruns, sdt collections with correct run position
      *
-     * @param pos The position at which the new run should be added.
-     * @param provider provide a new run at position of the given cursor.
-     * @return the inserted run or null if the given pos is out of bounds.
+     * @param cursor
+     * @return
      */
-    private XWPFSDTRun insertNewProvidedSdtRun(int pos, Function<XmlCursor, XWPFSDTRun> provider) {
-        if (pos >= 0 && pos < iruns.size()) {
-            IRunElement runElement = iruns.get(pos);
-            XmlCursor newCursor = null;
-            if (runElement instanceof XWPFRun) {
-                XWPFRun run = (XWPFRun) iruns.get(pos);
-                CTR ctr = run.getCTR();
-                newCursor = ctr.newCursor();
-            } else if (runElement instanceof XWPFSDTRun) {
-                XWPFSDTRun run = (XWPFSDTRun) iruns.get(pos);
-                CTSdtRun ctr = run.getCtSdtRun();
-                newCursor = ctr.newCursor();
+    public XWPFSDTRun insertNewSDTRunByCursor(XmlCursor cursor) {
+        if (isCursorInParagraph(cursor)) {
+            String uri = CTSdtRun.type.getName().getNamespaceURI();
+            String localPart = "sdt";
+            cursor.beginElement(localPart, uri);
+            cursor.toParent();
+            CTSdtRun sdt = (CTSdtRun) cursor.getObject();
+            XWPFSDTRun newSdtRun = new XWPFSDTRun(sdt, this);
+            XmlObject o = null;
+            while (!(o instanceof CTSdtRun) && (cursor.toPrevSibling())) {
+                o = cursor.getObject();
+            }
+            if (!(o instanceof CTSdtRun)) {
+                sdtRuns.add(0, newSdtRun);
             } else {
-                throw new RuntimeException("Can't process element " + runElement.getClass());
+                int pos = sdtRuns.indexOf(getSDTRun((CTSdtRun) o)) + 1;
+                sdtRuns.add(pos, newSdtRun);
             }
+            int i = 0;
+            XmlCursor sdtCursor = sdt.newCursor();
+            try {
+                cursor.toCursor(sdtCursor);
+                while (cursor.toPrevSibling()) {
+                    o = cursor.getObject();
+                    if (o instanceof CTR || o instanceof CTSdtRun) {
+                        i++;
+                    }
+                }
+                iruns.add(i, newSdtRun);
+                cursor.toCursor(sdtCursor);
+                cursor.toEndToken();
+                return newSdtRun;
+            } finally {
+                sdtCursor.dispose();
+                cursor.dispose();
+            }
+        }
+        return null;
+    }
 
-            if (!isCursorInParagraph(newCursor)) {
-                // look up correct position for CTP -> XXX -> R array
-                newCursor.toParent();
+    public XWPFSDTRun getSDTRun(CTSdtRun ctSdtRun) {
+        for (int i = 0; i < sdtRuns.size(); i++) {
+            if (getSDTRuns().get(i).getCtSdtRun() == ctSdtRun) {
+                return getSDTRuns().get(i);
             }
-            if (isCursorInParagraph(newCursor)) {
-                // provide a new sdt run
-                XWPFSDTRun newRun = provider.apply(newCursor);
-                iruns.add(pos, newRun);
-                return newRun;
-            }
-            newCursor.dispose();
         }
         return null;
     }
@@ -1846,6 +1857,7 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
                 XmlCursor c = ((XWPFSDTRun) sdtRun).getCtSdtRun().newCursor();
                 c.removeXml();
                 c.dispose();
+                sdtRuns.remove(sdtRun);
                 iruns.remove(sdtRun);
                 return true;
             }
