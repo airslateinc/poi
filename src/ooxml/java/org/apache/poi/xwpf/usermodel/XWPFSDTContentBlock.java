@@ -233,6 +233,13 @@ public class XWPFSDTContentBlock implements ISDTContent, ISDTContentBlock {
             bodyElements.add(p);
             return p;
         } else if (elem instanceof XWPFTable) {
+            if (((XWPFTable) elem).fetchTblText().toString().equals("")) {
+                CTP ctp = ctSdtContentBlock.addNewP();
+                XWPFParagraph p = new XWPFParagraph(ctp, parent);
+                paragraphs.add(p);
+                bodyElements.add(p);
+                return p;
+            }
             CTTbl ctTbl = ctSdtContentBlock.addNewTbl();
             ctTbl.set(((XWPFTable) elem).getCTTbl());
             XWPFTable tbl = new XWPFTable(ctTbl, parent);
