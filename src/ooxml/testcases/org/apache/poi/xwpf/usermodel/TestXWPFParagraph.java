@@ -556,7 +556,21 @@ public final class TestXWPFParagraph {
             assertTrue(p.removeRun(0));
         }
     }
-    
+
+    @Test
+    public void testRemoveHyperLinkRun() {
+        XWPFDocument doc = new XWPFDocument();
+        XWPFParagraph p = doc.createParagraph();
+        p.createRun().setText("Hyperlink: ");
+        XWPFHyperlinkRun hyperLink = p.createHyperlinkRun("https://google.com");
+        hyperLink.setText("https://google.com");
+
+        assertTrue(p.getIRuns().get(1) instanceof XWPFHyperlinkRun);
+        assertEquals(2, doc.getParagraphs().get(0).getIRuns().size());
+        p.removeRun(1);
+        assertEquals(1, doc.getParagraphs().get(0).getIRuns().size());
+    }
+
     @Test
     public void testFieldRuns() throws IOException {
         try (XWPFDocument doc = XWPFTestDataSamples.openSampleDocument("FldSimple.docx")) {

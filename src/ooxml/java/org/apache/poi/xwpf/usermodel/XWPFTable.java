@@ -165,7 +165,12 @@ public class XWPFTable implements IBodyElement, ISDTContentsBlock {
             createEmptyTable(table);
         }
 
-        for (CTRow row : table.getTrList()) {
+        this.text = fetchTblText();
+    }
+
+    public StringBuilder fetchTblText() {
+        StringBuilder tblText = new StringBuilder();
+        for (CTRow row : this.ctTbl.getTrList()) {
             StringBuilder rowText = new StringBuilder();
             XWPFTableRow tabRow = new XWPFTableRow(row, this);
             tableRows.add(tabRow);
@@ -179,10 +184,11 @@ public class XWPFTable implements IBodyElement, ISDTContentsBlock {
                 }
             }
             if (rowText.length() > 0) {
-                this.text.append(rowText);
-                this.text.append('\n');
+                tblText.append(rowText);
+                tblText.append('\n');
             }
         }
+        return tblText;
     }
 
     private void createEmptyTable(CTTbl table) {

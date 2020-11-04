@@ -1647,11 +1647,16 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
         if (pos >= 0 && pos < runs.size()) {
             // Remove the run from our high level lists
             XWPFRun run = runs.get(pos);
-            if (run instanceof XWPFHyperlinkRun ||
-                run instanceof XWPFFieldRun) {
-                // TODO Add support for removing these kinds of nested runs,
-                //  which aren't on the CTP -> R array, but CTP -> XXX -> R array
-                throw new IllegalArgumentException("Removing Field or Hyperlink runs not yet supported");
+            // CTP -> CTHyperlink -> R array
+            if (run instanceof XWPFHyperlinkRun
+                    && isTheOnlyCTHyperlinkInRuns((XWPFHyperlinkRun) run)) {
+                XmlCursor c = ((XWPFHyperlinkRun) run).getCTHyperlink()
+                        .newCursor();
+                c.removeXml();
+                c.dispose();
+                runs.remove(pos);
+                iruns.remove(run);
+                return true;
             }
             runs.remove(pos);
             iruns.remove(run);
@@ -1668,6 +1673,21 @@ public class XWPFParagraph implements IBodyElement, IRunBody, ISDTContentsBlock,
             return true;
         }
         return false;
+    }
+
+    /**
+     * Is there only one ctHyperlink in all runs
+     *
+     * @param run
+     *            hyperlink run
+     * @return
+     */
+    private boolean isTheOnlyCTHyperlinkInRuns(XWPFHyperlinkRun run) {
+        CTHyperlink ctHyperlink = run.getCTHyperlink();
+        long count = runs.stream().filter(r -> (r instanceof XWPFHyperlinkRun
+                && ctHyperlink == ((XWPFHyperlinkRun) r).getCTHyperlink()))
+                .count();
+        return count <= 1;
     }
 
     /**
