@@ -12,9 +12,9 @@ public class XWPFSDTRun extends XWPFAbstractSDT
 
     public XWPFSDTRun(CTSdtRun ctSdtRun, IRunBody parent) {
         super(ctSdtRun.getSdtPr());
-        this.contentRun = new XWPFSDTContentRun(ctSdtRun.getSdtContent(), this);
-        this.ctSdtRun = ctSdtRun;
         this.parent = parent;
+        this.ctSdtRun = ctSdtRun;
+        this.contentRun = new XWPFSDTContentRun(ctSdtRun.getSdtContent(), this);
     }
 
     @Override

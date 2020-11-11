@@ -12,9 +12,9 @@ public class XWPFSDTBlock extends XWPFAbstractSDT
 
     public XWPFSDTBlock(CTSdtBlock sdtBlock, IBody part) {
         super(sdtBlock.getSdtPr());
-        this.contentBlock = new XWPFSDTContentBlock(sdtBlock.getSdtContent(), part);
         this.ctSdtBlock = sdtBlock;
         this.part = part;
+        this.contentBlock = new XWPFSDTContentBlock(sdtBlock.getSdtContent(), part);
     }
 
     @Override
