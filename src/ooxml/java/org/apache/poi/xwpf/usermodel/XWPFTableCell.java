@@ -457,7 +457,7 @@ public class XWPFTableCell implements IBody, ICell {
     @Override
     public XWPFSDTBlock getSdtBlock(CTSdtBlock ctSdtBlock) {
         for (int i = 0; i < sdtBlocks.size(); i++) {
-            if (getTables().get(i).getCTTbl() == ctSdtBlock) {
+            if (getSdtBlocks().get(i).getCtSdtBlock() == ctSdtBlock) {
                 return getSdtBlocks().get(i);
             }
         }
